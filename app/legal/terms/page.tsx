@@ -69,10 +69,10 @@ export default function TermsPage() {
           We offer a 30-day no-questions-asked refund through LemonSqueezy.
           Email{" "}
           <a
-            href="mailto:info@javamantra.com"
+            href="mailto:support@centproof.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            info@javamantra.com
+            support@centproof.com
           </a>{" "}
           within 30 days of purchase to request a refund. After 30 days,
           refunds are at our discretion.
@@ -115,10 +115,10 @@ export default function TermsPage() {
           updates from centproof.com or our release host. We provide product
           support by email at{" "}
           <a
-            href="mailto:info@javamantra.com"
+            href="mailto:support@centproof.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            info@javamantra.com
+            support@centproof.com
           </a>{" "}
           on a reasonable-effort basis during normal business hours.
         </P>
@@ -215,10 +215,10 @@ export default function TermsPage() {
         <P>
           Questions about these terms? Email{" "}
           <a
-            href="mailto:info@javamantra.com"
+            href="mailto:support@centproof.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            info@javamantra.com
+            support@centproof.com
           </a>
           .
         </P>

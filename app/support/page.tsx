@@ -6,7 +6,7 @@ import { PageShell } from "@/components/page-shell";
 export const metadata: Metadata = {
   title: "Support",
   description:
-    "Direct support from Java Mantra Corp. Email info@javamantra.com for license help, bug reports, bank parser requests, refunds, and privacy/security questions. Same-day reply on purchases; 2 business days otherwise.",
+    "Direct support from Java Mantra Corp. Email support@centproof.com for license help, bug reports, bank parser requests, refunds, and privacy/security questions. Same-day reply on purchases; 2 business days otherwise.",
   alternates: { canonical: "/support" },
   openGraph: {
     title: "CentProof support",
@@ -78,10 +78,10 @@ export default function SupportPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
-              href="mailto:info@javamantra.com?subject=CentProof%20support"
+              href="mailto:support@centproof.com?subject=CentProof%20support"
               className="inline-flex h-11 items-center justify-center rounded-lg bg-[#0F766E] px-4 text-sm font-semibold text-white hover:bg-[#115E59]"
             >
-              info@javamantra.com
+              support@centproof.com
             </a>
             <Link
               href="/banks#request"
@@ -97,13 +97,9 @@ export default function SupportPage() {
             </Link>
           </div>
           <p className="mt-6 text-xs text-[#64748B]">
-            We will move support to{" "}
-            <code className="rounded bg-[#F1F5F9] px-1 py-0.5">
-              support@centproof.com
-            </code>{" "}
-            once that mailbox is provisioned. Until then,{" "}
-            <strong>info@javamantra.com</strong> is the single place to reach a
-            human.
+            <strong>support@centproof.com</strong> is the single place to reach
+            a human at Java Mantra Corp. We aim to acknowledge every email
+            within one business day.
           </p>
         </div>
       </section>

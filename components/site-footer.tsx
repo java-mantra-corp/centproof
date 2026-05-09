@@ -54,10 +54,10 @@ export function SiteFooter() {
           </p>
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <a
-              href="mailto:info@javamantra.com"
+              href="mailto:support@centproof.com"
               className="hover:text-[#0F766E]"
             >
-              info@javamantra.com
+              support@centproof.com
             </a>
             <span aria-hidden>·</span>
             <a

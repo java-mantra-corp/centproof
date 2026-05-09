@@ -47,9 +47,9 @@ export function LegalDoc({
             email{" "}
             <a
               className="underline hover:no-underline"
-              href="mailto:info@javamantra.com"
+              href="mailto:support@centproof.com"
             >
-              info@javamantra.com
+              support@centproof.com
             </a>
             .
           </div>

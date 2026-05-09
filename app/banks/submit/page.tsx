@@ -43,7 +43,7 @@ export default function BankRequestPage() {
           kind: "error",
           message:
             body.error ??
-            "We couldn't submit your request. Please try again or email info@javamantra.com directly.",
+            "We couldn't submit your request. Please try again or email support@centproof.com directly.",
         });
         return;
       }
@@ -52,7 +52,7 @@ export default function BankRequestPage() {
       setState({
         kind: "error",
         message:
-          "Network error. Please try again, or email info@javamantra.com directly.",
+          "Network error. Please try again, or email support@centproof.com directly.",
       });
     }
   }
