@@ -385,6 +385,14 @@ export const pricingFaqs = [
     question: "Can I get a refund?",
     answer: "CentProof will offer a 30-day no-questions-asked refund policy through LemonSqueezy.",
   },
+  {
+    question: "What happens if my Pro Monthly subscription ends?",
+    answer: "Your previously imported data stays fully accessible — you can keep searching, viewing, and browsing all of it. Auto-updates keep working too. You drop back to Free Test Mode caps for new imports, full exports, and unlimited Ask CentProof. Re-subscribe anytime and Pro features reactivate instantly. Your data is never deleted.",
+  },
+  {
+    question: "Will Pro Lifetime stop getting updates after one year?",
+    answer: "Your purchased version keeps working forever, and bug-fix updates we choose to ship will still install. The 'one year of updates and support' covers new feature work and direct support replies. After year one, major new feature releases may be offered as optional paid upgrades — but you are never forced to pay again to keep using what you bought.",
+  },
 ];
 
 export const faqs = [

@@ -84,10 +84,10 @@ export default function DownloadPage() {
                 <p className="mt-3 text-xs text-[#64748B]">
                   Java Mantra Corp is finishing the launch build. Email{" "}
                   <a
-                    href="mailto:support@centproof.com"
+                    href="mailto:info@javamantra.com"
                     className="font-semibold text-[#0F766E] hover:underline"
                   >
-                    support@centproof.com
+                    info@javamantra.com
                   </a>{" "}
                   to be notified at launch.
                 </p>

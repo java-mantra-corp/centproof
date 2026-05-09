@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { BankBadge, SectionIntro } from "@/components/cards";
 import { PageShell } from "@/components/page-shell";
 import { comingSoonBanks, supportedBanks } from "@/components/site-content";
@@ -49,11 +50,14 @@ export default function BanksPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:py-20">
+      <section
+        id="request"
+        className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:py-20"
+      >
         <SectionIntro
           eyebrow="Coming soon"
           title="More parsers are planned."
-          body="If your bank is missing, send a redacted sample statement and we’ll prioritize it."
+          body="If your bank is missing, tell us about it. We prioritize parsers by demand and ship the most-requested ones first."
         />
         <div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -61,8 +65,21 @@ export default function BanksPage() {
               <BankBadge key={bank} name={bank} muted />
             ))}
           </div>
-          <div className="mt-6 rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-6 text-sm font-semibold text-[#475569]">
-            Sample upload/request form coming soon.
+          <div className="mt-6 rounded-2xl border border-[#0F766E]/20 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#0F172A]">
+              Request a new bank
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-[#475569]">
+              Send us the bank or card name and your email. If we want a
+              sample PDF we&apos;ll reply asking you to email a redacted one
+              directly — never paste real statements into a web form.
+            </p>
+            <Link
+              href="/banks/submit"
+              className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-[#0F766E] px-5 text-sm font-semibold text-white shadow-sm hover:bg-[#115E59]"
+            >
+              Request a parser →
+            </Link>
           </div>
         </div>
       </section>

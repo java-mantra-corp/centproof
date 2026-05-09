@@ -69,10 +69,10 @@ export default function TermsPage() {
           We offer a 30-day no-questions-asked refund through LemonSqueezy.
           Email{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>{" "}
           within 30 days of purchase to request a refund. After 30 days,
           refunds are at our discretion.
@@ -115,10 +115,10 @@ export default function TermsPage() {
           updates from centproof.com or our release host. We provide product
           support by email at{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>{" "}
           on a reasonable-effort basis during normal business hours.
         </P>
@@ -193,11 +193,11 @@ export default function TermsPage() {
 
       <Section number="13" title="Governing law">
         <P>
-          These terms are governed by the laws of the State of Florida,
+          These terms are governed by the laws of the State of California,
           USA, without regard to its conflict-of-laws principles. Any dispute
-          will be resolved in the state or federal courts located in Florida,
-          unless a binding consumer-protection law in your jurisdiction
-          provides otherwise.
+          will be resolved in the state and federal courts located in the
+          Northern District of California, unless a binding consumer-protection
+          law in your jurisdiction provides otherwise.
         </P>
       </Section>
 
@@ -215,10 +215,10 @@ export default function TermsPage() {
         <P>
           Questions about these terms? Email{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>
           .
         </P>

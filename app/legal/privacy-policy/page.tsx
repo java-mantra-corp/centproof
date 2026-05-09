@@ -31,10 +31,10 @@ export default function PrivacyPolicyPage() {
           purchases and provide support: your email address, billing details
           handled by LemonSqueezy on our behalf, and any messages you send to{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>
           .
         </P>
@@ -42,13 +42,14 @@ export default function PrivacyPolicyPage() {
 
       <Section number="2" title="Who we are">
         <P>
-          The data controller for CentProof is <strong>Java Mantra Corp</strong>
-          , a Florida corporation, contactable at{" "}
+          The data controller for CentProof is{" "}
+          <strong>Java Mantra Corp</strong>, a California corporation
+          headquartered in the San Francisco Bay Area, contactable at{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>
           .
         </P>
@@ -156,10 +157,10 @@ export default function PrivacyPolicyPage() {
           conversation, fulfilling these requests usually means a single
           email exchange. Send requests to{" "}
           <a
-            href="mailto:support@centproof.com"
+            href="mailto:info@javamantra.com"
             className="font-semibold text-[#0F766E] hover:underline"
           >
-            support@centproof.com
+            info@javamantra.com
           </a>
           .
         </P>
