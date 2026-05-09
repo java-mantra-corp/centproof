@@ -1,0 +1,40 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024"
+     xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Centproof app icon — master source.
+
+    Composition:
+      - macOS-style rounded square background (rx=200) in teal-700
+      - Bold C in white: 300° arc opening right (Centproof + cent reading)
+      - Audit checkmark (✓) in white, fitted inside the C interior
+
+    The cent-sign vertical stem was tried in v1 but it visually crashed
+    the checkmark.  Dropped in favor of the cleaner C-with-check mark
+    that the AI references converged on.  Reads as both:
+      - C — the Centproof initial
+      - The cent symbol's defining curve (audit / verification)
+      - With ✓ — the "proof" half of the brand name
+
+    To re-skin: change the two color values below.
+      Background (teal-700):  #0F766E
+      Foreground (white):     #FFFFFF
+  -->
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="230" ry="230" fill="#0F766E"/>
+
+  <!-- Bold C arc (300° arc, opens to the right) -->
+  <path d="M 760 365 A 280 280 0 1 0 760 659"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="115"
+        stroke-linecap="round"/>
+
+  <!-- Audit checkmark inside the C -->
+  <path d="M 360 510 L 460 605 L 640 410"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="80"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
