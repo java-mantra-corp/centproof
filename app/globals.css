@@ -22,3 +22,105 @@ body {
   background: #ccfbf1;
   color: #0f172a;
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   .legal-prose
+   Typography for the legal pages (Privacy Policy, Terms of Service,
+   Refund Policy, Disclaimer, Cookie Policy).  We embed cleaned HTML
+   exported from Termly via dangerouslySetInnerHTML inside <LegalDoc>;
+   this class makes that embedded markup match the rest of the site
+   (Inter font, slate colour palette, teal links) without us having to
+   rewrite Termly's HTML structure.
+
+   Termly's exports use heavy <div> nesting plus inline <strong>, <em>,
+   <ul>, <table>, etc.  These rules style each of those elements
+   regardless of how deeply they're wrapped.
+   ────────────────────────────────────────────────────────────────── */
+.legal-prose {
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.legal-prose h2 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.legal-prose h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.legal-prose p,
+.legal-prose div {
+  margin-bottom: 0.5rem;
+}
+
+.legal-prose ul,
+.legal-prose ol {
+  margin: 0.75rem 0 1rem 1.5rem;
+}
+
+.legal-prose ul {
+  list-style: disc;
+}
+.legal-prose ol {
+  list-style: decimal;
+}
+.legal-prose li {
+  margin-bottom: 0.25rem;
+}
+
+.legal-prose strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.legal-prose em {
+  font-style: italic;
+}
+
+.legal-prose a {
+  color: #0f766e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+.legal-prose a:hover {
+  text-decoration: none;
+}
+
+.legal-prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.25rem 0 1.5rem;
+  font-size: 0.875rem;
+}
+.legal-prose th,
+.legal-prose td {
+  border: 1px solid #e2e8f0;
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-prose th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Termly emits stray <br> tags for spacing — render them as small
+   margins instead of double-line gaps. */
+.legal-prose br {
+  display: block;
+  content: "";
+  margin-top: 0.25rem;
+}

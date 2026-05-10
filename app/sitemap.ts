@@ -22,6 +22,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/support", priority: 0.5, changeFrequency: "monthly" },
     { path: "/legal/privacy-policy", priority: 0.4, changeFrequency: "monthly" },
     { path: "/legal/terms", priority: 0.4, changeFrequency: "monthly" },
+    { path: "/legal/refund-policy", priority: 0.35, changeFrequency: "monthly" },
+    { path: "/legal/cookie-policy", priority: 0.3, changeFrequency: "monthly" },
+    { path: "/legal/disclaimer", priority: 0.3, changeFrequency: "monthly" },
+    { path: "/legal/data-request", priority: 0.3, changeFrequency: "monthly" },
   ];
   return entries.map(({ path, priority, changeFrequency }) => ({
     url: `${SITE_URL}${path}`,

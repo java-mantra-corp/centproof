@@ -17,6 +17,10 @@ const companyLinks = [
 const legalLinks = [
   ["Privacy Policy", "/legal/privacy-policy"],
   ["Terms of Service", "/legal/terms"],
+  ["Refund Policy", "/legal/refund-policy"],
+  ["Cookie Policy", "/legal/cookie-policy"],
+  ["Disclaimer", "/legal/disclaimer"],
+  ["Data Request", "/legal/data-request"],
 ] as const;
 
 export function SiteFooter() {

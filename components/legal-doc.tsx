@@ -1,27 +1,49 @@
 import { PageShell } from "@/components/page-shell";
 
 /**
- * Shared layout for legal pages — Privacy Policy, Terms of Service, etc.
+ * Shared layout for legal pages — Privacy Policy, Terms of Service,
+ * Refund Policy, Disclaimer, Cookie Policy.
  *
- * Renders a centered, readable body column with a header showing the
- * document title, "last updated" date, and a clear "this is the current
- * draft, review with counsel before public launch" notice.  Pass the
- * actual content as children using the `Section` and `P` helpers below.
+ * Two rendering modes:
+ *
+ *  1. **`children`** — pass JSX (using the `Section` / `P` / `UL` helpers
+ *     below) when you're hand-writing the policy.  Used for short pages
+ *     like /legal/data-request.
+ *
+ *  2. **`html`** — pass a string of cleaned Termly HTML when the
+ *     authoritative source is Termly.  The HTML is rendered with
+ *     dangerouslySetInnerHTML inside a `.legal-prose` container, so the
+ *     existing typography in `app/globals.css` matches the rest of the
+ *     site (Inter font, slate text, teal links) without the Termly
+ *     rendering looking out of place.
+ *
+ * The `intro` prop is rendered above the body in both modes — useful for
+ * a one-paragraph plain-English summary before the formal text begins.
+ *
+ * The `draft` flag (default false) shows a yellow advisory banner
+ * marking the document as pre-launch.  Once Termly content is in place
+ * we leave this off everywhere.
  */
 export function LegalDoc({
   title,
   effective,
   intro,
   draft = false,
+  preface,
+  html,
   children,
 }: {
   title: string;
   effective: string;
   intro?: string;
-  /** When true, renders a yellow advisory banner stating the document is
-   *  awaiting legal review.  Set to `false` once a lawyer has signed off. */
   draft?: boolean;
-  children: React.ReactNode;
+  /** Optional content rendered between the intro and the policy body —
+   *  useful for product-specific notes (e.g. "CentProof is a digital
+   *  download, no physical return is required"). */
+  preface?: React.ReactNode;
+  /** Termly-cleaned HTML to embed.  Mutually exclusive with `children`. */
+  html?: string;
+  children?: React.ReactNode;
 }) {
   return (
     <PageShell>
@@ -30,9 +52,7 @@ export function LegalDoc({
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#0F172A] sm:text-5xl">
           {title}
         </h1>
-        <p className="mt-4 text-sm text-[#64748B]">
-          Effective {effective}.
-        </p>
+        <p className="mt-4 text-sm text-[#64748B]">Effective {effective}.</p>
         {intro ? (
           <p className="mt-6 text-base leading-7 text-[#475569]">{intro}</p>
         ) : null}
@@ -42,9 +62,8 @@ export function LegalDoc({
             className="mt-6 rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] px-5 py-4 text-sm leading-6 text-[#92400E]"
           >
             <strong className="font-semibold">Pre-launch draft.</strong> This
-            document reflects how CentProof is intended to operate. It is being
-            reviewed by counsel before public launch. If you have questions,
-            email{" "}
+            document reflects how CentProof is intended to operate and is
+            being reviewed before public launch. If you have questions, email{" "}
             <a
               className="underline hover:no-underline"
               href="mailto:support@centproof.com"
@@ -54,9 +73,18 @@ export function LegalDoc({
             .
           </div>
         ) : null}
-        <div className="mt-10 space-y-10 text-base leading-7 text-[#334155]">
-          {children}
-        </div>
+        {preface ? <div className="mt-6">{preface}</div> : null}
+        {html ? (
+          <div
+            className="legal-prose mt-10"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        ) : null}
+        {children ? (
+          <div className="mt-10 space-y-10 text-base leading-7 text-[#334155]">
+            {children}
+          </div>
+        ) : null}
       </article>
     </PageShell>
   );
