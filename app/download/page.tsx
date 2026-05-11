@@ -5,12 +5,12 @@ import { PageShell } from "@/components/page-shell";
 export const metadata: Metadata = {
   title: "Download CentProof for Mac",
   description:
-    "Install the signed and notarized macOS app. Direct download from centproof.com. Apple Silicon recommended for local AI; Intel supported.",
+    "Install the signed and notarized macOS app. Direct download from centproof.com. Apple Silicon (M1, M2, M3, M4) on macOS 13 or later.",
   alternates: { canonical: "/download" },
   openGraph: {
     title: "Download CentProof for Mac",
     description:
-      "Direct download for macOS. Signed with Apple Developer ID and notarized by Apple.",
+      "Direct download for macOS. Signed with Apple Developer ID and notarized by Apple. Apple Silicon required.",
     url: "/download",
     type: "website",
   },
@@ -54,8 +54,10 @@ export default function DownloadPage() {
             </h2>
             <ul className="mt-5 space-y-3 text-sm text-[#475569]">
               <li>macOS 13 Ventura or later</li>
-              <li>Apple Silicon recommended for local AI</li>
-              <li>Intel supported, local AI may be slower</li>
+              <li>Apple Silicon — M1, M2, M3, or M4</li>
+              <li>
+                Intel Macs and Windows are not supported in this release
+              </li>
             </ul>
             {DOWNLOAD_URL ? (
               <>
