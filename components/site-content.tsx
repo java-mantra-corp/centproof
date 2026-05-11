@@ -279,11 +279,37 @@ export const comingSoonBanks = [
  */
 const SUPPORT_FALLBACK = "/support";
 
-const lifetimeBase =
-  process.env.NEXT_PUBLIC_LEMONSQUEEZY_LIFETIME_URL ?? SUPPORT_FALLBACK;
-const monthlyUrl =
-  process.env.NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_URL ?? SUPPORT_FALLBACK;
-const launchCoupon = process.env.NEXT_PUBLIC_LEMONSQUEEZY_LAUNCH_COUPON ?? "";
+/** Treat an env value of `undefined`, `""`, or whitespace-only as
+ *  "unset" → fall back to the support URL.  Why this matters: Vercel
+ *  "Sensitive" env vars can't easily have their environment-membership
+ *  changed after creation, but you CAN edit their VALUE per-environment.
+ *  Setting the Production value to "" lets us hide a CTA without
+ *  deleting and re-creating the var.  Plain `??` only triggers on
+ *  null/undefined, so we'd render an empty `href=""` link — defending
+ *  against that here.
+ *
+ *  Note: these reads MUST use the literal `process.env.NEXT_PUBLIC_*`
+ *  syntax (not bracket-notation) so Next.js's build-time DefinePlugin
+ *  inlines the value into the client bundle. */
+function presentOrFallback(
+  v: string | undefined,
+  fallback: string,
+): string {
+  return v && v.trim().length > 0 ? v : fallback;
+}
+
+const lifetimeBase = presentOrFallback(
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_LIFETIME_URL,
+  SUPPORT_FALLBACK,
+);
+const monthlyUrl = presentOrFallback(
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_URL,
+  SUPPORT_FALLBACK,
+);
+const launchCoupon = presentOrFallback(
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_LAUNCH_COUPON,
+  "",
+);
 
 /** Append the launch coupon to the lifetime URL when configured.  This
  *  is what powers the "$39 launch lifetime" link during the first 30
