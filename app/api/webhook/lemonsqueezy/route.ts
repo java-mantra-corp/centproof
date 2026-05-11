@@ -1,58 +1,51 @@
 /**
- * CentProof license webhook — Next.js Route Handler version.
+ * CentProof license webhook — Next.js Route Handler (Phase 5.11.x).
  *
  * Lives at https://centproof.com/api/webhook/lemonsqueezy.  Configure
- * this URL on LemonSqueezy's Webhooks page (Settings → Webhooks).
+ * this URL in LemonSqueezy's Webhooks page.
  *
- * This is a port of webhook/src/index.ts (Phase 5.11) from Cloudflare
- * Workers + Hono to a Vercel-hosted Next.js Route Handler.  All the
- * business logic (signature verification, license signing, email
- * rendering) lives in @/lib/webhook/* and was lifted unchanged — that
- * code uses only Web-standard APIs (crypto.subtle, fetch, TextEncoder,
- * btoa/atob, @noble/ed25519) so it ports cleanly between runtimes.
+ * Flow for v0.1.1 (LS API switch):
  *
- * Why on Vercel instead of Cloudflare:
- *   - Same vendor as the marketing site → one account, one dashboard
- *   - Webhook URL on our own domain (centproof.com) rather than
- *     centproof-webhook.<user>.workers.dev — cleaner branding for the
- *     LemonSqueezy dashboard's webhook config screen
- *   - Same env-var panel as NEXT_PUBLIC_DOWNLOAD_URL + Resend keys
+ *   1. LS fires `license_key_created` after each Pro purchase
+ *      (Lifetime one-time or Monthly subscription start).  The
+ *      generated license key is in the webhook payload — we just
+ *      relay it via email.  No more ed25519 signing.
+ *   2. LS fires `subscription_cancelled` when a Monthly user cancels —
+ *      we send a polite "we're sorry to see you go" email.  No
+ *      revocation needed; LS marks the license inactive when `exp`
+ *      passes, and the desktop app's nightly validate picks that up.
+ *   3. Everything else (order_created, subscription_payment_success,
+ *      refunds) → kind: "ignore" → 200 OK so LS doesn't retry.
  *
- * Required Vercel env vars (set in dashboard → Settings → Environment
- * Variables, NOT NEXT_PUBLIC_ prefixed since these are secrets the
- * client must never see):
+ * Required Vercel env vars (Settings → Environment Variables):
  *
  *   LEMONSQUEEZY_WEBHOOK_SECRET
  *     Signing secret LemonSqueezy generates when you create the
  *     webhook.  We HMAC-SHA256 the raw POST body against this.
  *
- *   CENTPROOF_LICENSE_PRIVATE_KEY_PEM
- *     ed25519 private key (PKCS8 PEM, multi-line) used to sign
- *     license payloads.  Matching public key is embedded in the
- *     desktop app at src-sidecar/src/license/publicKey.ts.
- *
  *   RESEND_API_KEY
- *     Resend.com API key (re_…) used to send license emails.
- *     The from-address must be on a verified Resend sending domain.
+ *     Resend.com API key (re_…) used to send license emails.  The
+ *     from-address must be on a verified Resend sending domain.
  *
- *   LEMONSQUEEZY_VARIANT_MAP
+ *   LEMONSQUEEZY_VARIANT_MAP   default: {}
  *     JSON like {"1636910":"lifetime","1637082":"monthly"} — maps LS
- *     variant IDs to our license types.  IDs come from the LS
- *     dashboard's product variant page.
+ *     variant IDs to our license types.  Falls back to inferring from
+ *     expires_at (null → lifetime, ISO → monthly) when missing.
  *
  *   RESEND_FROM_EMAIL   default "licenses@centproof.com"
  *   SUPPORT_EMAIL       default "support@centproof.com"
- *   ACCOUNT_URL         default "https://centproof.com/account"
+ *   ACCOUNT_URL         default "https://centproof.com/pricing"
+ *
+ * Notably ABSENT from v0.1.1: CENTPROOF_LICENSE_PRIVATE_KEY_PEM —
+ * we no longer sign licenses ourselves.  Safe to delete from the
+ * Vercel env panel after this deploy goes live (the route handler
+ * doesn't reference it anymore).
  */
 
 import {
-  issueLicense,
-  loadPrivateKeySeed,
-  type LicenseType,
-} from "@/lib/webhook/license";
-import {
   parseLemonSqueezyEvent,
   verifyLemonsqueezySignature,
+  type LicenseType,
 } from "@/lib/webhook/lemonsqueezy";
 import { sendEmail } from "@/lib/webhook/email";
 import {
@@ -60,21 +53,16 @@ import {
   renderLicenseEmail,
 } from "@/lib/webhook/templates";
 
-// Force the Node.js runtime — @noble/ed25519 works on Edge too, but
-// Node is more predictable for the PKCS8 PEM parsing we do at boot
-// and gives us more debuggable error traces in Vercel logs.
+// Node runtime gives us nicer error traces in Vercel logs than Edge.
+// Either works since we only use fetch + Web Crypto (no Node-only APIs).
 export const runtime = "nodejs";
-
-// Webhook handlers must not be cached.  Vercel caches GET responses
-// by default; POST isn't cached but the marker is good documentation.
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
   // ── 1. Read raw body for HMAC verification ───────────────────────
-  // The signature is over the EXACT bytes LemonSqueezy sent.  Any
-  // re-serialisation (e.g. JSON.parse → JSON.stringify) would change
-  // whitespace / key order and break the HMAC.  So we read the body
-  // as text, verify, THEN parse for use.
+  // Signature is over the EXACT bytes LS sent.  JSON.parse →
+  // JSON.stringify changes whitespace / key order and breaks the
+  // HMAC, so we verify the raw text first, then parse for use.
   const rawBody = await request.text();
   const sigHeader = request.headers.get("x-signature") ?? "";
 
@@ -93,7 +81,7 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("invalid signature", { status: 401 });
   }
 
-  // ── 2. Parse the payload + the variant map ───────────────────────
+  // ── 2. Parse payload + variant map ───────────────────────────────
   let payload: unknown;
   try {
     payload = JSON.parse(rawBody);
@@ -109,23 +97,14 @@ export async function POST(request: Request): Promise<Response> {
     >;
   } catch {
     console.error("[webhook] LEMONSQUEEZY_VARIANT_MAP is not valid JSON");
-    // Continue with empty map; parseLemonSqueezyEvent has defaults
-    // ("order_created" → lifetime, "subscription_*" → monthly).
+    // Continue with empty map; parseLemonSqueezyEvent has a sensible
+    // fallback (infer from expires_at).
   }
 
-  // Reject LemonSqueezy test-mode purchases on the live production
-  // deploy.  Why: before the LS store is activated (KYC + banking)
-  // every purchase is a test-mode purchase using `4242 4242 4242 4242`,
-  // so anyone visiting the public checkout URL could mint a free
-  // Pro license.  This gate slams that door regardless of whether
-  // we accidentally publish the LS URL on /pricing too early.
-  //
-  // Preview deploys (vercel.app subdomains) and local `vercel dev`
-  // KEEP test mode enabled so we can continue running end-to-end
-  // tests with the 4242 card.  Activation is governed by VERCEL_ENV:
-  //   "production"  → strict (only real card purchases issue licenses)
-  //   "preview"     → permissive (test cards work)
-  //   undefined / "development" → permissive
+  // Test-mode safety gate.  Pre-activation, every LS purchase is
+  // test-mode using the 4242 card — refuse to issue licenses in
+  // production for those (preview deploys keep test mode on so we
+  // can keep exercising the full flow).
   const rejectTestMode = process.env.VERCEL_ENV === "production";
   const event = parseLemonSqueezyEvent(payload, variantMap, rejectTestMode);
 
@@ -134,48 +113,34 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("ok (ignored)\n");
   }
 
-  // ── 3. Resolve env vars used by license + email ──────────────────
-  const privateKeyPem = process.env.CENTPROOF_LICENSE_PRIVATE_KEY_PEM ?? "";
+  // ── 3. Resolve mailing env ───────────────────────────────────────
   const resendApiKey = process.env.RESEND_API_KEY ?? "";
   const fromEmail =
     process.env.RESEND_FROM_EMAIL ?? "licenses@centproof.com";
   const supportEmail = process.env.SUPPORT_EMAIL ?? "support@centproof.com";
-  // ACCOUNT_URL points at the marketing-site page a buyer would visit
-  // if they wanted to subscribe again after cancelling.  /pricing is the
-  // right destination — we deliberately don't run an /account page
-  // because there's no per-user backend (LemonSqueezy owns the
-  // billing-management portal; our app verifies licenses offline).
   const accountUrl =
     process.env.ACCOUNT_URL ?? "https://centproof.com/pricing";
 
-  if (!privateKeyPem || !resendApiKey) {
-    console.error("[webhook] missing required env: PRIVATE_KEY_PEM or RESEND_API_KEY");
+  if (!resendApiKey) {
+    console.error("[webhook] missing RESEND_API_KEY env");
     return new Response("server misconfigured", { status: 500 });
   }
 
-  // ── 4. Issue / renew → sign + email license ──────────────────────
-  if (event.kind === "issue" || event.kind === "renew") {
-    const seed = loadPrivateKeySeed(privateKeyPem);
-    const wire = await issueLicense({
-      email: event.email,
-      name: event.name,
-      type: event.type,
-      exp: event.exp,
-      purchaseId: event.purchaseId,
-      privateKeyBytes: seed,
-    });
-
+  // ── 4. Issue (license_key_created) → email the LS-generated key ──
+  if (event.kind === "issue" && event.licenseKey) {
     const { subject, text, html } = renderLicenseEmail(
       {
         name: event.name,
-        licenseKey: wire,
+        licenseKey: event.licenseKey,
         type: event.type,
         exp: event.exp,
         purchaseId: event.purchaseId,
         accountUrl,
         supportEmail,
       },
-      event.kind === "renew",
+      false, // isRenewal — LS doesn't re-issue keys on renewals in our
+              // config (we set "Reissue license key on each payment"
+              // OFF), so we never see a "renewal" license_key_created
     );
 
     await sendEmail(
@@ -190,8 +155,7 @@ export async function POST(request: Request): Promise<Response> {
       resendApiKey,
     );
 
-    console.log("[webhook] license issued", {
-      kind: event.kind,
+    console.log("[webhook] license email sent", {
       type: event.type,
       email: event.email,
       purchaseId: event.purchaseId,
@@ -199,10 +163,7 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("ok\n");
   }
 
-  // ── 5. Cancel → polite "subscription ending" email ───────────────
-  // No revocation — desktop app downgrades automatically when the
-  // existing license's exp lapses (which LS already set when the
-  // subscription was active).
+  // ── 5. Cancel → polite goodbye email ─────────────────────────────
   if (event.kind === "cancel") {
     const { subject, text, html } = renderCancelEmail({
       name: event.name,
@@ -221,30 +182,16 @@ export async function POST(request: Request): Promise<Response> {
       },
       resendApiKey,
     );
-    console.log("[webhook] cancel", { email: event.email });
+    console.log("[webhook] cancel email sent", { email: event.email });
     return new Response("ok\n");
   }
 
-  // ── 6. Refund → just log ─────────────────────────────────────────
-  // We deliberately don't auto-revoke — that would require online
-  // verification (which contradicts our local-first promise).  Refund
-  // volume is tiny and abuse can be handled manually if it ever
-  // becomes a real problem.
-  if (event.kind === "refund") {
-    console.log("[webhook] refund", {
-      email: event.email,
-      purchaseId: event.purchaseId,
-    });
-    return new Response("ok (refund logged)\n");
-  }
-
-  // TypeScript exhaustiveness — unreachable.
+  // TS exhaustiveness — unreachable; `issue` without licenseKey was
+  // filtered out by parseLemonSqueezyEvent.
   return new Response("ok\n");
 }
 
-// GET probe so you can visit the URL in a browser and confirm the
-// route exists (returns "ok").  Vercel's health checks also like
-// having a non-POST endpoint that doesn't 405.
+// GET probe — visit the URL in a browser to confirm the route exists.
 export async function GET(): Promise<Response> {
   return new Response("ok\n");
 }

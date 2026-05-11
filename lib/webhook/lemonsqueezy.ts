@@ -1,5 +1,5 @@
 /**
- * LemonSqueezy webhook handling (Phase 5.11).
+ * LemonSqueezy webhook handling (Phase 5.11.x — LS API switch for v0.1.1).
  *
  * Two responsibilities:
  *   1. verifySignature — HMAC-SHA256 the raw body against the shared
@@ -7,34 +7,41 @@
  *      doesn't match (constant-time compare).
  *   2. parseEvent     — pull the bits we care about out of the payload.
  *
- * LemonSqueezy webhook events we handle:
- *   - order_created                  one-time purchase (Pro Lifetime)
- *   - subscription_created           first-time subscription start
- *   - subscription_payment_success   recurring renewal
- *   - subscription_cancelled         user cancelled (license keeps
- *                                    working until exp; no immediate
- *                                    revocation)
- *   - subscription_payment_failed    retry pending; no action needed
- *                                    (we already issued; if they don't
- *                                    pay, exp lapses naturally)
- *   - order_refunded                 refund issued (rare; logged only —
- *                                    a true revocation system would
- *                                    require an online check, which
- *                                    we deliberately avoid)
+ * Events we ACT on (the rest are ignored with kind: "ignore"):
  *
- * What we deliberately DO NOT do here:
- *   - Maintain our own customer database.  LemonSqueezy IS the source
- *     of truth for who paid and when.  We just turn their events into
- *     signed license payloads.
- *   - Phone home from the desktop app.  Verification is local and
- *     offline.
+ *   license_key_created     The big one.  Fires every time LS generates
+ *                           a license key — once per Pro Lifetime
+ *                           purchase, once per Pro Monthly subscription
+ *                           start.  The key string itself is in the
+ *                           payload (data.attributes.key), so we just
+ *                           email it to the buyer.
  *
- * The webhook is stateless — every event is a self-contained
- * (payload, signature) pair that we sign and forward.  No DB, no KV
- * store, no per-customer record.
+ *   subscription_cancelled  Send a polite "we're sorry to see you go"
+ *                           email.  The desktop app already knows about
+ *                           the cancellation via the lastValidatedAt
+ *                           pull — when the user's `exp` expires LS
+ *                           reports the license as inactive and the
+ *                           app drops to free.
+ *
+ * Events we EXPLICITLY ignore (LS sends them but we don't need to
+ * act):
+ *
+ *   order_created                    — license_key_created follows; act there
+ *   subscription_created             — same
+ *   subscription_payment_success     — renewal, LS extends exp on
+ *                                       existing key, no new email
+ *   subscription_payment_failed      — user already gets LS's dunning
+ *                                       email; we'd just add noise
+ *   order_refunded                   — refunds are rare; LS handles
+ *                                       customer-side notification, we
+ *                                       log for audit
+ *
+ * Why no maintaining our own customer DB: LemonSqueezy IS the source of
+ * truth for who paid and when.  We turn their `license_key_created`
+ * events into emails; everything else (renewals, validation, device
+ * tracking) is handled by LS's License API which the desktop app calls
+ * directly.
  */
-
-import type { LicenseType } from "./license";
 
 /**
  * Verify a LemonSqueezy webhook payload's HMAC-SHA256 signature
@@ -59,8 +66,7 @@ export async function verifyLemonsqueezySignature(
   const sigBytes = await crypto.subtle.sign("HMAC", key, enc.encode(rawBody));
   const expectedHex = bufferToHex(sigBytes);
 
-  // Constant-time compare to avoid timing leaks.  WebCrypto doesn't
-  // ship a built-in compare, so we do it manually with XOR-fold.
+  // Constant-time compare to avoid timing leaks.
   return constantTimeEqual(expectedHex, receivedSig.toLowerCase());
 }
 
@@ -83,34 +89,37 @@ function constantTimeEqual(a: string, b: string): boolean {
 // Event parsing
 // ============================================================================
 
+export type LicenseType = "monthly" | "lifetime";
+
 /**
- * Actionable webhook event — one of issue / renew / cancel / refund.
- * Sparse — most fields in the original payload are useless to us
- * (analytics, currency conversions, etc.).
+ * Actionable event — we either email a license, or email a cancel
+ * notification.  No more "issue" / "renew" / "refund" — LS handles
+ * renewals itself (the key stays valid; we don't reissue) and refunds
+ * are silent-log.
  */
 export interface ActionableWebhookEvent {
-  kind: "issue" | "renew" | "cancel" | "refund";
-  /** Buyer email — license `sub` field + email recipient. */
+  kind: "issue" | "cancel";
+  /** Buyer email — destination of our email + identity for the
+   *  license_key activation in the desktop app.  Comes from the
+   *  license_key's customer_email / user_email field on
+   *  license_key_created, or the subscription's user_email on
+   *  cancellation. */
   email: string;
-  /** Buyer's display name — license `name` field + email greeting. */
+  /** Buyer's display name — email greeting. */
   name: string;
-  /** Stable LemonSqueezy ID for this purchase / subscription.
-   *  Stored in license `purchase_id` for support lookups. */
+  /** Stable LemonSqueezy ID for support lookups. */
   purchaseId: string;
-  /** Did the buyer pay for monthly or lifetime?
-   *  Driven by which LemonSqueezy product variant they bought,
-   *  passed through unchanged. */
+  /** Pro Monthly vs Pro Lifetime — set on `issue`, defaulted on `cancel`. */
   type: LicenseType;
-  /** ISO YYYY-MM-DD when this license should expire.  Lifetime
-   *  licenses set this to null (the license verifier reads null as
-   *  "never expires"). */
+  /** The actual license key string LS generated.  Only present on
+   *  `kind: "issue"` — the buyer pastes this exact string into
+   *  Preferences > License in the desktop app. */
+  licenseKey?: string;
+  /** ISO YYYY-MM-DD expiry.  null for lifetime; the cancellation flow
+   *  uses LS's `ends_at` so the user knows when access drops. */
   exp: string | null;
 }
 
-/** Returned for events we don't need to act on (unknown event_name,
- *  payload missing required fields, etc.).  The webhook always
- *  returns 200 OK on these — we never want LemonSqueezy retrying a
- *  no-op event. */
 export interface IgnoredWebhookEvent {
   kind: "ignore";
   reason: string;
@@ -120,26 +129,23 @@ export type ParsedWebhookEvent = ActionableWebhookEvent | IgnoredWebhookEvent;
 
 /**
  * Map raw LemonSqueezy events to our domain.  Returns `kind: "ignore"`
- * for event types we don't care about (subscription_payment_failed,
- * etc.) so the webhook always returns 200 — we never want LemonSqueezy
- * to retry a "no-op" event repeatedly.
+ * for anything other than license_key_created or subscription_cancelled
+ * — the webhook always responds 200 OK on those, so LS doesn't retry.
  *
- * The exact LemonSqueezy event shape isn't fully typed here on purpose:
- * we pluck out the few fields we need and ignore the rest, so changes
- * upstream (new fields, deprecations) don't break us.
+ * The exact LemonSqueezy event shape isn't fully typed here on
+ * purpose: we pluck the few fields we use and accept the rest as
+ * unknown, so LS schema additions don't break us.
  */
 export function parseLemonSqueezyEvent(
   payload: unknown,
-  /** Map of LemonSqueezy variant_id → "monthly" | "lifetime".  Set in
-   *  the webhook config; this is how we know which product the buyer
-   *  paid for. */
+  /** Map of LS variant_id → "monthly" | "lifetime".  Some webhook
+   *  payloads (license_key_created in particular) don't include the
+   *  variant directly — we resolve via this lookup. */
   variantMap: Record<string, LicenseType>,
-  /** When true, reject LemonSqueezy `test_mode: true` events with
-   *  `kind: "ignore"`.  Set this in production so a publicly-visible
-   *  test-mode checkout URL can't be used to mint free licenses while
-   *  the store is still pending KYC activation.  Default false so dev
-   *  / preview environments can keep using the 4242 test card to
-   *  exercise the full flow. */
+  /** When true, reject `test_mode: true` events with kind: "ignore".
+   *  Wire this to VERCEL_ENV === "production" so the public webhook
+   *  can't be used to mint free licenses while LS is still in test
+   *  mode (pre-activation). */
   rejectTestMode: boolean = false,
 ): ParsedWebhookEvent {
   if (!payload || typeof payload !== "object") {
@@ -158,13 +164,7 @@ export function parseLemonSqueezyEvent(
     return { kind: "ignore", reason: "no event_name in meta" };
   }
 
-  // Test-mode safety gate.  Before the LS store is activated (KYC +
-  // banking), every purchase is a test-mode purchase with the
-  // `4242 4242 4242 4242` card — which means anyone visiting the
-  // public checkout URL could mint a free Pro license.  Reject those
-  // in production so the only way to get a license is a real card
-  // post-activation.  The dev / preview deploys keep test mode on so
-  // we can continue exercising the full sign + email + activate flow.
+  // Test-mode safety gate (see comment on rejectTestMode above).
   if (rejectTestMode && p.meta?.test_mode === true) {
     return {
       kind: "ignore",
@@ -178,72 +178,68 @@ export function parseLemonSqueezyEvent(
     return { kind: "ignore", reason: "no data.attributes" };
   }
   const a = data.attributes;
-
-  // Common fields shared between order_* and subscription_* events.
-  const email = String(a.user_email ?? a.email ?? "");
-  const name = String(a.user_name ?? a.name ?? "");
   const purchaseId = String(data.id ?? "");
 
-  if (!email || !purchaseId) {
-    return { kind: "ignore", reason: "missing email or id" };
-  }
-
   switch (eventName) {
-    case "order_created": {
-      // One-time purchase — Pro Lifetime per pricing-strategy.md §4.
-      const variantId = String(
-        a.first_order_item ? (a.first_order_item as { variant_id?: number }).variant_id ?? "" : "",
-      );
-      const type = variantMap[variantId] ?? "lifetime";
+    case "license_key_created": {
+      // The license key string LIVES on the event payload — LS
+      // generated it server-side when the order / subscription was
+      // created.  We just email it to the buyer.  No ed25519 signing,
+      // no payload schema of our own.
+      const licenseKey = String(a.key ?? "");
+      const email = String(a.user_email ?? a.customer_email ?? "");
+      const name = String(a.user_name ?? a.customer_name ?? "");
+      const variantId = String(a.variant_id ?? "");
+      // LS doesn't ship the type directly on license_key_created —
+      // resolve via the variant map (set in env).  Default to
+      // lifetime when expires_at is null (LS's convention), else
+      // monthly.
+      const expiresAt = a.expires_at ?? null;
+      const type: LicenseType =
+        variantMap[variantId] ??
+        (expiresAt === null || expiresAt === "" ? "lifetime" : "monthly");
+      const exp =
+        typeof expiresAt === "string" && expiresAt.length > 0
+          ? expiresAt.slice(0, 10)
+          : null;
+
+      if (!licenseKey || !email) {
+        return {
+          kind: "ignore",
+          reason: `license_key_created missing key or email (key=${!!licenseKey}, email=${!!email})`,
+        };
+      }
       return {
         kind: "issue",
         email,
         name: name || email,
         purchaseId,
         type,
-        exp: null, // lifetime never expires
+        licenseKey,
+        exp,
       };
     }
 
-    case "subscription_created":
-    case "subscription_payment_success": {
-      // Subscription start OR renewal — recompute exp from
-      // attributes.renews_at (ISO) which LemonSqueezy includes.
-      const renewsAt = String(a.renews_at ?? a.ends_at ?? "");
-      if (!renewsAt) {
-        return { kind: "ignore", reason: "no renews_at on subscription" };
+    case "subscription_cancelled": {
+      const email = String(a.user_email ?? "");
+      const name = String(a.user_name ?? "");
+      const endsAt = a.ends_at ?? a.renews_at ?? null;
+      const exp =
+        typeof endsAt === "string" && endsAt.length > 0
+          ? endsAt.slice(0, 10)
+          : null;
+      if (!email) {
+        return { kind: "ignore", reason: "subscription_cancelled missing email" };
       }
-      const variantId = String(a.variant_id ?? "");
-      const type = variantMap[variantId] ?? "monthly";
-      return {
-        kind: eventName === "subscription_created" ? "issue" : "renew",
-        email,
-        name: name || email,
-        purchaseId,
-        type,
-        exp: renewsAt.slice(0, 10), // ISO YYYY-MM-DD
-      };
-    }
-
-    case "subscription_cancelled":
       return {
         kind: "cancel",
         email,
         name: name || email,
         purchaseId,
         type: "monthly",
-        exp: null,
+        exp,
       };
-
-    case "order_refunded":
-      return {
-        kind: "refund",
-        email,
-        name: name || email,
-        purchaseId,
-        type: "lifetime",
-        exp: null,
-      };
+    }
 
     default:
       return { kind: "ignore", reason: `unhandled event_name: ${eventName}` };

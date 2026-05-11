@@ -7,7 +7,7 @@
  * users opening the license email want the key, not a sales pitch.
  */
 
-import type { LicenseType } from "./license";
+import type { LicenseType } from "./lemonsqueezy";
 
 interface LicenseEmailVars {
   name: string;
