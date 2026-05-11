@@ -35,6 +35,17 @@ export function renderLicenseEmail(
       ? "This is a lifetime license — no expiry, includes 1 year of updates."
       : `Subscription renews on ${vars.exp ?? "—"}.  License will refresh automatically.`;
 
+  // Lifetime purchases have nothing to "manage" — no recurring billing,
+  // no subscription portal.  Monthly purchases get an explicit pointer
+  // to LemonSqueezy's customer-portal link, which arrives in the
+  // separate receipt email LS sends (we deliberately don't try to
+  // mint our own portal URL — LS owns the magic-link auth flow and
+  // any URL we hard-code here would be guesswork).
+  const manageLine =
+    vars.type === "lifetime"
+      ? "" // nothing to manage for lifetime licenses
+      : `To update billing or cancel: open the receipt email from LemonSqueezy and click "Manage subscription" — that link logs you into your customer portal.\n\n`;
+
   const text = `Hi ${greetingName},
 
 ${
@@ -55,9 +66,7 @@ To activate:
 
 ${expLine}
 
-Manage your subscription at: ${vars.accountUrl}
-
-Need help?  Reply to this email or write to ${vars.supportEmail}.
+${manageLine}Need help?  Reply to this email or write to ${vars.supportEmail}.
 We answer every message ourselves.
 
 Purchase ID: ${vars.purchaseId}
@@ -90,7 +99,11 @@ Purchase ID: ${vars.purchaseId}
   <p style="color: #64748b; font-size: 13px;">${escapeHtml(expLine)}</p>
 
   <p style="color: #64748b; font-size: 13px;">
-    Manage your subscription: <a href="${escapeAttr(vars.accountUrl)}" style="color: #0ea5e9;">${escapeHtml(vars.accountUrl)}</a><br/>
+    ${
+      vars.type === "lifetime"
+        ? ""
+        : `To update billing or cancel: open the receipt email from LemonSqueezy and click "Manage subscription" — that link logs you into your customer portal.<br/>`
+    }
     Need help?  Reply to this email or write to <a href="mailto:${escapeAttr(vars.supportEmail)}" style="color: #0ea5e9;">${escapeHtml(vars.supportEmail)}</a>.  We answer every message ourselves.
   </p>
 
@@ -117,13 +130,17 @@ export function renderCancelEmail(
   const subject = "Your CentProof subscription has been cancelled";
   const greetingName = vars.name.split(/\s+/)[0] || vars.name;
 
+  // accountUrl env points at the marketing-site pricing page — that's
+  // where a cancelled subscriber would go to come back.  We don't have
+  // (and don't want) a "manage your account" page since we don't run a
+  // user database — LemonSqueezy is the source of truth for billing.
   const text = `Hi ${greetingName},
 
 Your CentProof Pro Monthly subscription has been cancelled.
 
 You'll keep Pro access through ${vars.exp ?? "the end of your current billing period"}.  After that, CentProof drops back to Free Test Mode — your existing data stays accessible exactly as it is, only new imports / Ask CentProof / full exports get gated.
 
-Want to come back?  Reactivate any time at ${vars.accountUrl}.
+Want to come back?  Resubscribe any time at ${vars.accountUrl}.
 
 If something pushed you out, we'd love to hear what.  Just reply to this email — your feedback shapes the next version.
 
@@ -138,7 +155,7 @@ If something pushed you out, we'd love to hear what.  Just reply to this email �
   <p>Hi ${escapeHtml(greetingName)},</p>
   <p>Your CentProof Pro Monthly subscription has been cancelled.</p>
   <p>You'll keep Pro access through <strong>${escapeHtml(vars.exp ?? "the end of your current billing period")}</strong>.  After that, CentProof drops back to Free Test Mode — your existing data stays accessible exactly as it is, only new imports / Ask CentProof / full exports get gated.</p>
-  <p>Want to come back?  Reactivate any time at <a href="${escapeAttr(vars.accountUrl)}" style="color: #0ea5e9;">${escapeHtml(vars.accountUrl)}</a>.</p>
+  <p>Want to come back?  Resubscribe any time at <a href="${escapeAttr(vars.accountUrl)}" style="color: #0ea5e9;">${escapeHtml(vars.accountUrl)}</a>.</p>
   <p style="color: #64748b; font-size: 13px;">If something pushed you out, we'd love to hear what.  Just reply to this email — your feedback shapes the next version.</p>
   <p style="color: #94a3b8; font-size: 11px; margin-top: 32px;">— Java Mantra Corp · <a href="mailto:${escapeAttr(vars.supportEmail)}" style="color: #94a3b8;">${escapeHtml(vars.supportEmail)}</a> · <a href="https://centproof.com" style="color: #94a3b8;">centproof.com</a></p>
 </body>

@@ -113,7 +113,21 @@ export async function POST(request: Request): Promise<Response> {
     // ("order_created" → lifetime, "subscription_*" → monthly).
   }
 
-  const event = parseLemonSqueezyEvent(payload, variantMap);
+  // Reject LemonSqueezy test-mode purchases on the live production
+  // deploy.  Why: before the LS store is activated (KYC + banking)
+  // every purchase is a test-mode purchase using `4242 4242 4242 4242`,
+  // so anyone visiting the public checkout URL could mint a free
+  // Pro license.  This gate slams that door regardless of whether
+  // we accidentally publish the LS URL on /pricing too early.
+  //
+  // Preview deploys (vercel.app subdomains) and local `vercel dev`
+  // KEEP test mode enabled so we can continue running end-to-end
+  // tests with the 4242 card.  Activation is governed by VERCEL_ENV:
+  //   "production"  → strict (only real card purchases issue licenses)
+  //   "preview"     → permissive (test cards work)
+  //   undefined / "development" → permissive
+  const rejectTestMode = process.env.VERCEL_ENV === "production";
+  const event = parseLemonSqueezyEvent(payload, variantMap, rejectTestMode);
 
   if (event.kind === "ignore") {
     console.log("[webhook] ignored event:", event.reason);
@@ -126,8 +140,13 @@ export async function POST(request: Request): Promise<Response> {
   const fromEmail =
     process.env.RESEND_FROM_EMAIL ?? "licenses@centproof.com";
   const supportEmail = process.env.SUPPORT_EMAIL ?? "support@centproof.com";
+  // ACCOUNT_URL points at the marketing-site page a buyer would visit
+  // if they wanted to subscribe again after cancelling.  /pricing is the
+  // right destination — we deliberately don't run an /account page
+  // because there's no per-user backend (LemonSqueezy owns the
+  // billing-management portal; our app verifies licenses offline).
   const accountUrl =
-    process.env.ACCOUNT_URL ?? "https://centproof.com/account";
+    process.env.ACCOUNT_URL ?? "https://centproof.com/pricing";
 
   if (!privateKeyPem || !resendApiKey) {
     console.error("[webhook] missing required env: PRIVATE_KEY_PEM or RESEND_API_KEY");

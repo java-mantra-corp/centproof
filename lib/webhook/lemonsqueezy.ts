@@ -134,12 +134,19 @@ export function parseLemonSqueezyEvent(
    *  the webhook config; this is how we know which product the buyer
    *  paid for. */
   variantMap: Record<string, LicenseType>,
+  /** When true, reject LemonSqueezy `test_mode: true` events with
+   *  `kind: "ignore"`.  Set this in production so a publicly-visible
+   *  test-mode checkout URL can't be used to mint free licenses while
+   *  the store is still pending KYC activation.  Default false so dev
+   *  / preview environments can keep using the 4242 test card to
+   *  exercise the full flow. */
+  rejectTestMode: boolean = false,
 ): ParsedWebhookEvent {
   if (!payload || typeof payload !== "object") {
     return { kind: "ignore", reason: "payload not an object" };
   }
   const p = payload as {
-    meta?: { event_name?: string };
+    meta?: { event_name?: string; test_mode?: boolean };
     data?: {
       type?: string;
       id?: string;
@@ -149,6 +156,21 @@ export function parseLemonSqueezyEvent(
   const eventName = p.meta?.event_name;
   if (!eventName) {
     return { kind: "ignore", reason: "no event_name in meta" };
+  }
+
+  // Test-mode safety gate.  Before the LS store is activated (KYC +
+  // banking), every purchase is a test-mode purchase with the
+  // `4242 4242 4242 4242` card — which means anyone visiting the
+  // public checkout URL could mint a free Pro license.  Reject those
+  // in production so the only way to get a license is a real card
+  // post-activation.  The dev / preview deploys keep test mode on so
+  // we can continue exercising the full sign + email + activate flow.
+  if (rejectTestMode && p.meta?.test_mode === true) {
+    return {
+      kind: "ignore",
+      reason:
+        "test_mode purchase ignored on production deploy (store not yet activated, or test webhook fired against prod)",
+    };
   }
 
   const data = p.data;
