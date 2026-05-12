@@ -105,39 +105,77 @@ export async function GET(
 
   // ── Manifest shape Tauri 2 expects ──────────────────────────────
   //
-  // The Tauri 2 updater plugin's deserialiser strongly prefers the
-  // platforms-keyed format:
+  // Two pieces of Tauri 2 indirection worth understanding before
+  // touching this:
   //
-  //   {
-  //     "version": "0.1.1",
-  //     "notes": "...",
-  //     "pub_date": "...",
-  //     "platforms": {
-  //       "darwin-aarch64": { "url": "...", "signature": "..." }
-  //     }
-  //   }
+  // 1. URL `{{target}}` substitution → bare OS only.
+  //    The plugin replaces `{{target}}` in the configured endpoint
+  //    URL with one of `darwin` / `linux` / `windows` (NO arch).
+  //    The OS+arch lookup happens client-side AFTER the manifest is
+  //    received.
   //
-  // The flat shape with top-level `url` / `signature` is the Tauri 1
-  // / legacy format and is not reliably accepted by all Tauri 2.x
-  // releases — some versions silently return "no update available"
-  // when they don't find the `platforms` key for the running target.
+  // 2. Manifest `platforms` dict → OS-arch keys.
+  //    The plugin's deserialiser expects:
   //
-  // History: v0.1.1 launch initially returned the flat shape and the
-  // in-app "Check for Updates" reported "You're on the latest
-  // version" against v0.1.0 even though the manifest's version was
-  // newer.  Switching to platforms-keyed fixed it.  Documenting here
-  // so a future contributor doesn't "simplify" this back to flat.
-  const platform =
-    latest.platforms?.[target] ??
-    // Input manifest was flat — synthesise the per-platform block.
-    // We always EMIT platforms-keyed even when the upstream
-    // latest.json is flat, so the client doesn't have to care.
-    (latest.url && latest.signature
-      ? { url: latest.url, signature: latest.signature }
-      : null);
+  //      {
+  //        "version": "0.1.1",
+  //        "notes": "...",
+  //        "pub_date": "...",
+  //        "platforms": {
+  //          "darwin-aarch64": { "url": "...", "signature": "..." },
+  //          "darwin-x86_64":  { "url": "...", "signature": "..." }, // when we ship Intel
+  //          "linux-x86_64":   { ... },
+  //          "windows-x86_64": { ... }
+  //        }
+  //      }
+  //
+  //    On each client, the plugin reads `platforms[osDashArch]` for
+  //    its own compiled-in osDashArch (e.g. `darwin-aarch64` for
+  //    Apple Silicon).
+  //
+  // So this route should:
+  //   • Accept bare OS in the URL `target` param (validated above)
+  //   • Pass through the FULL platforms dict from the upstream
+  //     manifest, NOT filter to one platform.  Filtering breaks the
+  //     client-side OS-arch lookup because the URL `target` doesn't
+  //     contain arch info.
+  //
+  // History (worth keeping in commit-comment archaeology):
+  //
+  //   v0.1.1 launch attempt 1: route returned `platforms: { [target]: ... }`
+  //     keyed by the URL's bare `target` ("darwin").  Tauri's client
+  //     looked for `platforms["darwin-aarch64"]`, didn't find it, no
+  //     update applied.  → THIS rewrite passes through the OS-arch
+  //     keys unchanged.
+  //
+  //   v0.1.1 launch attempt 2: route returned flat top-level
+  //     `url` + `signature`.  Tauri 2 silently rejected it (legacy
+  //     Tauri 1 format).  → Fixed by switching to platforms-keyed.
+  //
+  // The Vercel route now does ONE job: fetch the upstream
+  // latest.json, version-compare, and return it (with a normalised
+  // platforms-keyed wrap for legacy flat inputs).
 
-  if (!platform) {
-    console.warn("[updates] manifest has no url/signature for target", {
+  let platforms: Record<string, { url: string; signature: string }>;
+
+  if (
+    latest.platforms &&
+    typeof latest.platforms === "object" &&
+    Object.keys(latest.platforms).length > 0
+  ) {
+    // Modern platforms-keyed input → pass through verbatim.
+    platforms = latest.platforms;
+  } else if (latest.url && latest.signature) {
+    // Legacy flat input → wrap as darwin-aarch64.  We only ship
+    // Apple Silicon today; when we add Intel / Windows / Linux,
+    // adjust the upstream latest.json to use platforms-keyed
+    // format directly (publish-release.sh already does this for
+    // new releases).
+    platforms = {
+      "darwin-aarch64": { url: latest.url, signature: latest.signature },
+    };
+  } else {
+    console.warn("[updates] manifest has neither platforms nor url/signature", {
       target,
       manifestKeys: Object.keys(latest),
     });
@@ -149,7 +187,7 @@ export async function GET(
       version: latest.version,
       pub_date: latest.pub_date,
       notes: latest.notes,
-      platforms: { [target]: platform },
+      platforms,
     },
     {
       headers: {
@@ -163,10 +201,41 @@ export async function GET(
 // Helpers
 // ───────────────────────────────────────────────────────────────────────
 
-/** Tauri target triples we expect to see for a Mac-only app.  Extend
- *  if you ever ship Windows / Linux. */
+/**
+ * Validate the {{target}} value Tauri's updater plugin substitutes
+ * into our endpoint URL.
+ *
+ * Tauri 2 quirk worth documenting: the docs example show the manifest
+ * `platforms` dict keyed by `darwin-aarch64` / `darwin-x86_64` / etc.
+ * (OS-arch).  That led me to assume the same OS-arch string lands in
+ * the URL.  It does NOT.  The plugin substitutes `{{target}}` with
+ * just the OS name (`darwin`, `linux`, `windows`); the OS+arch lookup
+ * happens client-side AFTER the manifest is received.
+ *
+ *   tauri.conf.json endpoint:    /updates/{{target}}/{{current_version}}
+ *   What Tauri actually fetches: /updates/darwin/0.1.0
+ *   What the manifest contains:  platforms.darwin-aarch64.{url, sig}
+ *                                platforms.darwin-x86_64.{url, sig}
+ *                                ...
+ *
+ * The plugin's deserialiser picks `platforms[currentOs-currentArch]`
+ * from the response.
+ *
+ * History: v0.1.1 launch — v0.1.0 users hit this route as
+ * /updates/darwin/0.1.0 (per Vercel logs), our regex required
+ * `<os>-<arch>` and rejected it as invalid → silent 204 → in-app
+ * "you're on the latest version" even though v0.1.1 was published.
+ * Fixed by accepting both forms (bare OS and full OS-arch).
+ */
 function isValidTarget(t: string): boolean {
-  return /^(darwin|linux|windows)-(aarch64|x86_64|i686)$/.test(t);
+  // Bare OS — what Tauri 2's updater plugin actually sends.
+  if (/^(darwin|linux|windows)$/.test(t)) return true;
+  // OS-arch — accept too in case a future Tauri version changes the
+  // substitution, or someone tests the endpoint manually with the full
+  // triple.  Doesn't change response behaviour: we always emit the full
+  // platforms dict and let the client filter.
+  if (/^(darwin|linux|windows)-(aarch64|x86_64|i686)$/.test(t)) return true;
+  return false;
 }
 
 function isValidSemver(v: string): boolean {
