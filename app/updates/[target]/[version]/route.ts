@@ -103,22 +103,60 @@ export async function GET(
     return new NextResponse(null, { status: 204 });
   }
 
-  // Per-target overrides: prefer { url, signature } scoped to this
-  // platform, fall back to the manifest-level url + signature.
-  const platform = latest.platforms?.[target];
-  const out: TauriUpdateManifest = {
-    version: latest.version,
-    pub_date: latest.pub_date,
-    url: platform?.url ?? latest.url,
-    signature: platform?.signature ?? latest.signature,
-    notes: latest.notes,
-  };
+  // ── Manifest shape Tauri 2 expects ──────────────────────────────
+  //
+  // The Tauri 2 updater plugin's deserialiser strongly prefers the
+  // platforms-keyed format:
+  //
+  //   {
+  //     "version": "0.1.1",
+  //     "notes": "...",
+  //     "pub_date": "...",
+  //     "platforms": {
+  //       "darwin-aarch64": { "url": "...", "signature": "..." }
+  //     }
+  //   }
+  //
+  // The flat shape with top-level `url` / `signature` is the Tauri 1
+  // / legacy format and is not reliably accepted by all Tauri 2.x
+  // releases — some versions silently return "no update available"
+  // when they don't find the `platforms` key for the running target.
+  //
+  // History: v0.1.1 launch initially returned the flat shape and the
+  // in-app "Check for Updates" reported "You're on the latest
+  // version" against v0.1.0 even though the manifest's version was
+  // newer.  Switching to platforms-keyed fixed it.  Documenting here
+  // so a future contributor doesn't "simplify" this back to flat.
+  const platform =
+    latest.platforms?.[target] ??
+    // Input manifest was flat — synthesise the per-platform block.
+    // We always EMIT platforms-keyed even when the upstream
+    // latest.json is flat, so the client doesn't have to care.
+    (latest.url && latest.signature
+      ? { url: latest.url, signature: latest.signature }
+      : null);
 
-  return NextResponse.json(out, {
-    headers: {
-      "Cache-Control": "no-store, must-revalidate",
+  if (!platform) {
+    console.warn("[updates] manifest has no url/signature for target", {
+      target,
+      manifestKeys: Object.keys(latest),
+    });
+    return new NextResponse(null, { status: 204 });
+  }
+
+  return NextResponse.json(
+    {
+      version: latest.version,
+      pub_date: latest.pub_date,
+      notes: latest.notes,
+      platforms: { [target]: platform },
     },
-  });
+    {
+      headers: {
+        "Cache-Control": "no-store, must-revalidate",
+      },
+    },
+  );
 }
 
 // ───────────────────────────────────────────────────────────────────────
