@@ -13,10 +13,14 @@ import {
 export const navItems = [
   ["Product", "/product"],
   ["Privacy", "/privacy"],
+  ["Security", "/security"],
   ["Banks", "/banks"],
   ["Pricing", "/pricing"],
   ["FAQ", "/faq"],
-  ["Download", "/download"],
+  ["Guides", "/guides"],
+  ["Changelog", "/changelog"],
+  // Download lives in the prominent right-aligned button in site-header
+  // (not the nav row), so it isn't duplicated here.
 ];
 
 export const heroTrust = [

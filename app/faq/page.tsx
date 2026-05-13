@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FAQItem } from "@/components/cards";
 import { PageShell } from "@/components/page-shell";
 import { faqs } from "@/components/site-content";
+import { faqPageSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   title: "Frequently asked questions",
@@ -20,6 +21,12 @@ export const metadata: Metadata = {
 export default function FAQPage() {
   return (
     <PageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqPageSchema(faqs)),
+        }}
+      />
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
         <div className="max-w-4xl">
           <p className="text-sm font-semibold text-[#0F766E]">FAQ</p>
