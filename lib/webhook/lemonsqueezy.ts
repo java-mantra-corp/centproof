@@ -189,14 +189,25 @@ export function parseLemonSqueezyEvent(
       const licenseKey = String(a.key ?? "");
       const email = String(a.user_email ?? a.customer_email ?? "");
       const name = String(a.user_name ?? a.customer_name ?? "");
+      // LS quirk: license_key_created events expose `product_id` but
+      // not `variant_id` (verified empirically against the v0.1.1 test
+      // purchase — see the payload archive in /docs/lemonsqueezy/).
+      // Other events (order_created) DO include variant_id.  Look up
+      // both so the same env-var map handles either id type — callers
+      // just put their product IDs and/or variant IDs in
+      // LEMONSQUEEZY_VARIANT_MAP.  The kept-as-fallback name "variant"
+      // is a v0.1.1 holdover; functionally it's now an id-map.
       const variantId = String(a.variant_id ?? "");
-      // LS doesn't ship the type directly on license_key_created —
-      // resolve via the variant map (set in env).  Default to
-      // lifetime when expires_at is null (LS's convention), else
-      // monthly.
+      const productId = String(a.product_id ?? "");
+      // Resolve via the id map first.  Default to lifetime when
+      // expires_at is null (LS's convention for one-time keys) — but
+      // this fallback is unreliable for subscriptions (LS keeps
+      // subscription license expires_at null too), so the map should
+      // always cover the live product/variant ids.
       const expiresAt = a.expires_at ?? null;
       const type: LicenseType =
         variantMap[variantId] ??
+        variantMap[productId] ??
         (expiresAt === null || expiresAt === "" ? "lifetime" : "monthly");
       const exp =
         typeof expiresAt === "string" && expiresAt.length > 0
