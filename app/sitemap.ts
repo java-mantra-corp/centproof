@@ -18,6 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/product", priority: 0.85, changeFrequency: "monthly" },
     { path: "/changelog", priority: 0.75, changeFrequency: "weekly" },
     { path: "/banks", priority: 0.7, changeFrequency: "weekly" },
+    { path: "/guides", priority: 0.65, changeFrequency: "monthly" },
+    {
+      path: "/guides/anatomy-of-a-bank-pdf-statement",
+      priority: 0.65,
+      changeFrequency: "monthly",
+    },
     { path: "/privacy", priority: 0.6, changeFrequency: "monthly" },
     { path: "/security", priority: 0.6, changeFrequency: "monthly" },
     { path: "/faq", priority: 0.6, changeFrequency: "monthly" },
