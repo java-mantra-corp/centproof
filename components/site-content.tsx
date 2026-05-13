@@ -312,7 +312,7 @@ const launchCoupon = presentOrFallback(
 );
 
 /** Append the launch coupon to the lifetime URL when configured.  This
- *  is what powers the "$39 launch lifetime" link during the first 30
+ *  is what powers the "$30 launch lifetime" link during the first 30
  *  days after public launch. */
 const lifetimeUrl =
   lifetimeBase !== SUPPORT_FALLBACK && launchCoupon
@@ -339,14 +339,14 @@ export const pricingPlans = [
   },
   {
     name: "Pro Lifetime",
-    price: "$59 one-time",
+    price: "$49 one-time",
     subtitle: "Pay once. Use CentProof forever.",
     cta: "Buy Lifetime",
     ctaUrl: lifetimeUrl,
     ctaExternal: lifetimeUrl !== SUPPORT_FALLBACK,
     badge: "Best value",
     launchPriceNote: launchCoupon
-      ? "$39 launch lifetime for the first 30 days"
+      ? "$30 launch lifetime for the first 30 days"
       : undefined,
     featured: true,
     bullets: [

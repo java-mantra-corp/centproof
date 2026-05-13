@@ -66,6 +66,11 @@ To activate:
 
 ${expLine}
 
+On an older CentProof version (0.1.0)?  If you see "malformed
+license key" when pasting, your app needs the v0.1.1 update first.
+Go to CentProof menu → About CentProof → Check for Updates…, install
+the update, then paste the key again.
+
 ${manageLine}Need help?  Reply to this email or write to ${vars.supportEmail}.
 We answer every message ourselves.
 
@@ -97,6 +102,14 @@ Purchase ID: ${vars.purchaseId}
   </ol>
 
   <p style="color: #64748b; font-size: 13px;">${escapeHtml(expLine)}</p>
+
+  <div style="background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; margin: 12px 0; font-size: 13px; color: #78350f; border-radius: 4px;">
+    <strong>On an older CentProof (v0.1.0)?</strong>  If you see
+    <em>"malformed license key"</em> when pasting, your app needs
+    the v0.1.1 update first.  Open <strong>CentProof menu → About
+    CentProof → Check for Updates…</strong>, install the update,
+    then paste the key again.
+  </div>
 
   <p style="color: #64748b; font-size: 13px;">
     ${
