@@ -70,7 +70,7 @@ export default function Home() {
           <ProductImagePlaceholder
             title="CentProof app screenshot"
             dimensions="1600×1000"
-            description="Replace with final macOS app screenshot showing Statements, Search, Ask CentProof, and local AI status."
+            description="CentProof main view: Statements, Search, Ask CentProof, and local AI status — all on your Mac."
             imagePath="/images/product/hero-app.png"
           />
           <div className="grid gap-3 sm:grid-cols-3">

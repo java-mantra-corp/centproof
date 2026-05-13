@@ -39,7 +39,7 @@ export default function ProductPage() {
           <SectionIntro
             eyebrow="Tour"
             title="Every feature starts with local statements."
-            body="These sections use screenshot placeholders until final product images are ready."
+            body="Import statements, reconcile to the cent, search and ask questions, all locally on your Mac."
           />
           <div className="mt-12 space-y-16">
             {productSections.map((section, index) => (
@@ -61,7 +61,7 @@ export default function ProductPage() {
                 <ProductImagePlaceholder
                   title={section.imageTitle}
                   dimensions="1600×1000"
-                  description={`Replace with final ${section.title} macOS screenshot.`}
+                  description={`${section.title} on CentProof for Mac.`}
                   imagePath={section.imagePath}
                 />
               </article>

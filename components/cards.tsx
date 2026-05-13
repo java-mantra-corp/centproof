@@ -1,5 +1,3 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
@@ -230,6 +228,21 @@ export function TrustBadge({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders a product screenshot.  Kept the historical name
+ * "ProductImagePlaceholder" so the existing call sites don't have to
+ * change, but as of v0.1.3 the placeholder card is the FALLBACK
+ * (imagePath missing), not the default.
+ *
+ * v0.1.3 fix: the previous existsSync check ran at render time and
+ * relied on process.cwd() pointing at the project root.  On Vercel's
+ * serverless runtime that's not always true (the build output's cwd
+ * differs from the project root), so the existsSync returned false
+ * in production and every call site rendered the placeholder card
+ * even though the screenshot files were deployed to /public.  We
+ * now trust imagePath unconditionally — next/image handles missing
+ * assets with its own 404 fallback at request time.
+ */
 export function ProductImagePlaceholder({
   title,
   dimensions,
@@ -241,11 +254,7 @@ export function ProductImagePlaceholder({
   description: string;
   imagePath?: string;
 }) {
-  const hasImage = imagePath
-    ? existsSync(join(process.cwd(), "public", imagePath.replace(/^\//, "")))
-    : false;
-
-  if (imagePath && hasImage) {
+  if (imagePath) {
     return (
       <div className="overflow-hidden rounded-3xl border border-[#E2E8F0] bg-white shadow-sm">
         <Image
@@ -259,6 +268,9 @@ export function ProductImagePlaceholder({
     );
   }
 
+  // No imagePath → render the design-time placeholder card.  Production
+  // code shouldn't hit this branch; it's a safety net for new feature
+  // sections that get added before the screenshot is taken.
   return (
     <div className="rounded-3xl border border-dashed border-[#CBD5E1] bg-white p-4 shadow-sm">
       <div className="flex aspect-[16/10] w-full flex-col items-center justify-center rounded-2xl bg-[#F8FAFC] px-6 text-center">
@@ -268,11 +280,6 @@ export function ProductImagePlaceholder({
         <p className="mt-3 max-w-xl text-sm leading-6 text-[#475569]">
           {description}
         </p>
-        {imagePath ? (
-          <p className="mt-4 rounded-full border border-[#E2E8F0] bg-white px-3 py-1 text-xs font-semibold text-[#64748B]">
-            {imagePath}
-          </p>
-        ) : null}
       </div>
     </div>
   );
