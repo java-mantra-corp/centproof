@@ -11,6 +11,7 @@ const productLinks = [
 const companyLinks = [
   ["FAQ", "/faq"],
   ["Privacy", "/privacy"],
+  ["Security", "/security"],
   ["Support", "/support"],
 ] as const;
 

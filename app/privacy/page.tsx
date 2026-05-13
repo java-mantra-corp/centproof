@@ -48,11 +48,17 @@ export default function PrivacyPage() {
           </div>
           <div className="mt-12 flex flex-col items-start gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-xl text-sm leading-6 text-[#475569]">
-              Looking for the formal legal text? The full Privacy Policy and
-              Terms of Service describe data handling, refunds, and
-              jurisdiction in detail.
+              Want the exact list of network calls, third parties, and how to
+              verify the app's signatures yourself? The Security page has
+              every concrete detail.
             </p>
             <div className="flex flex-wrap gap-3">
+              <Link
+                href="/security"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-[#0F766E] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#115E59]"
+              >
+                Security page →
+              </Link>
               <Link
                 href="/legal/privacy-policy"
                 className="inline-flex h-10 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:border-[#0F766E] hover:text-[#0F766E]"
