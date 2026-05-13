@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProductImagePlaceholder, SectionIntro, TrustBadge } from "@/components/cards";
 import { PageShell } from "@/components/page-shell";
 
@@ -45,8 +46,8 @@ export default function DownloadPage() {
             Download CentProof for Mac.
           </h1>
           <p className="mt-6 text-lg leading-8 text-[#475569]">
-            Install the signed and notarized macOS app, import a sample
-            statement or your own PDFs, and see how local-first finance feels.
+            Install the signed and notarized macOS app, import your own bank
+            and credit-card PDFs, and see how local-first finance feels.
           </p>
           <div className="mt-8 rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-[#0F172A]">
@@ -98,10 +99,10 @@ export default function DownloadPage() {
           </div>
         </div>
         <ProductImagePlaceholder
-          title="Pricing / license screen screenshot"
+          title="CentProof — Statements view"
           dimensions="1600×1000"
-          description="Replace with final download or license screen screenshot showing direct macOS install and license activation."
-          imagePath="/images/product/license-screen.png"
+          description="What you'll see right after installing: imported statements, balance reconciliation, and source-row provenance — all on your Mac."
+          imagePath="/images/product/statementImport.png"
         />
       </section>
 
@@ -151,6 +152,43 @@ export default function DownloadPage() {
           ].map((item) => (
             <TrustBadge key={item}>{item}</TrustBadge>
           ))}
+        </div>
+
+        {/* Verify-the-download block: easy trust signal for users who
+            audit binaries.  Concrete commands live on /security so we
+            don't duplicate them; this section just signposts them. */}
+        <div className="mt-10 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-6 sm:p-8">
+          <h3 className="text-lg font-semibold text-[#0F172A]">
+            Verify the download yourself
+          </h3>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#475569]">
+            Every release publishes a SHA-256 of the .dmg on its GitHub
+            release page. The Security page walks through three short
+            commands to confirm the SHA-256, the Apple Developer ID
+            signature, and Apple notarization — works offline.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/security"
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-[#0F766E] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#115E59]"
+            >
+              How to verify →
+            </Link>
+            <a
+              href="https://github.com/java-mantra-corp/centproof-releases/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:border-[#0F766E] hover:text-[#0F766E]"
+            >
+              GitHub Releases ↗
+            </a>
+            <Link
+              href="/changelog"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:border-[#0F766E] hover:text-[#0F766E]"
+            >
+              Release notes →
+            </Link>
+          </div>
         </div>
       </section>
     </PageShell>
