@@ -1,0 +1,65 @@
+# CentProof
+
+> CentProof is a local-first macOS application for importing PDF bank
+> and credit-card statements, reconciling balances to the cent, and
+> searching financial history with on-device AI.  Statements, ledger,
+> AI prompts, and exports never leave the user's Mac — there is no
+> cloud sync and the app never asks for bank credentials.
+
+CentProof is built and sold by Java Mantra Corp.  It is distributed
+as a signed, Apple-notarised macOS .dmg downloaded directly from
+centproof.com (no App Store).  Requires macOS 13 Ventura or later
+on Apple Silicon (M1, M2, M3, or M4).  Intel Macs and Windows are
+not supported.
+
+Pricing (USD): Free Test Mode for trial imports; Pro Lifetime $49
+one-time (3 Macs, 12 months of feature updates included); Pro
+Monthly $5/mo (1 Mac, cancel anytime).  A launch-window coupon
+drops Lifetime to $30 for the first ~30 days after public launch.
+Purchase + license keys are handled by LemonSqueezy as merchant of
+record, with a 30-day no-questions refund policy.
+
+## Product
+
+- [Product overview](https://centproof.com/product): the feature
+  tour — statement import, ledger, reconciliation, search, Ask
+  CentProof local AI, exports.
+- [Download](https://centproof.com/download): direct .dmg with
+  system requirements and a step-by-step install flow.
+- [Security](https://centproof.com/security): Apple Developer ID
+  signing, Apple notarisation, SHA-256 publication, the full list
+  of network calls the app makes, and commands users can run to
+  verify the .dmg themselves before installing.
+- [Privacy](https://centproof.com/privacy): the plain-English
+  privacy summary — what stays local, what (if anything) leaves
+  the device, and what third parties are involved (payment +
+  release hosting only).
+- [Banks](https://centproof.com/banks): list of US bank and
+  credit-card PDF formats currently parsed without manual mapping.
+
+## Pricing and support
+
+- [Pricing](https://centproof.com/pricing): the three plans
+  side-by-side with refund + multi-Mac terms.
+- [FAQ](https://centproof.com/faq): direct answers about
+  distribution, license keys, local AI, exports, refunds, and
+  explicit non-goals.
+- [Support](https://centproof.com/support): support@centproof.com
+  contact and a form for requesting bank-PDF coverage.
+- [Changelog](https://centproof.com/changelog): release history,
+  mirrored from the open CHANGELOG.md in the releases repository.
+
+## Guides
+
+- [Anatomy of a bank PDF statement](https://centproof.com/guides/anatomy-of-a-bank-pdf-statement):
+  walk-through of the seven standard sections of a US bank
+  statement (header, account summary, deposits, withdrawals,
+  fees/interest, daily balance, account-specific extras) and what
+  CentProof reconciliation checks in each section.
+
+## Optional
+
+- [Legal — Privacy Policy](https://centproof.com/legal/privacy-policy)
+- [Legal — Terms of Service](https://centproof.com/legal/terms)
+- [Legal — Refund Policy](https://centproof.com/legal/refund-policy)
+- [Java Mantra Corp](https://javamantra.com): publisher / developer.

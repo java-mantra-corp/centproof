@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductImagePlaceholder, SectionIntro, TrustBadge } from "@/components/cards";
+import { DownloadDmgButton } from "@/components/download-cta";
 import { PageShell } from "@/components/page-shell";
 
 export const metadata: Metadata = {
@@ -62,13 +63,10 @@ export default function DownloadPage() {
             </ul>
             {DOWNLOAD_URL ? (
               <>
-                <a
+                <DownloadDmgButton
                   href={DOWNLOAD_URL}
-                  className="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-[#0F766E] px-4 text-sm font-semibold text-white hover:bg-[#115E59]"
-                  data-cta="download-dmg"
-                >
-                  Download CentProof.dmg
-                </a>
+                  versionLabel={DOWNLOAD_VERSION_LABEL}
+                />
                 {DOWNLOAD_VERSION_LABEL ? (
                   <p className="mt-3 text-xs text-[#64748B]">
                     {DOWNLOAD_VERSION_LABEL} · Apple Developer ID signed ·

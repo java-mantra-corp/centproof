@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const SITE_URL =
@@ -77,6 +78,7 @@ export default function RootLayout({
         </a>
         {children}
         <StructuredData />
+        <Analytics />
       </body>
     </html>
   );
