@@ -33,7 +33,13 @@ export function renderLicenseEmail(
   const expLine =
     vars.type === "lifetime"
       ? "This is a lifetime license — no expiry, includes 1 year of updates."
-      : `Subscription renews on ${vars.exp ?? "—"}.  License will refresh automatically.`;
+      : vars.exp
+        ? `Subscription renews on ${vars.exp}.  License will refresh automatically.`
+        : // LS keeps `expires_at: null` on subscription license keys —
+          // the subscription state lives separately — so we never get
+          // a concrete renewal date on license_key_created.  Use a
+          // cleaner generic wording instead of "renews on —".
+          "Your monthly subscription is active.  The license refreshes automatically with each billing cycle.";
 
   // Lifetime purchases have nothing to "manage" — no recurring billing,
   // no subscription portal.  Monthly purchases get an explicit pointer
