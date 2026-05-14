@@ -264,22 +264,34 @@ export function parseLemonSqueezyEvent(
       // to rely on alone — we send a branded follow-up pointing at
       // the LS customer portal so the user can update their card
       // before they lose Pro access.
+      //
+      // Important: this event delivers a `subscription-invoices`
+      // resource (NOT a `subscriptions` resource).  Verified against
+      // the LS test-mode simulated event — webhook_id a1c6049d.
+      // That means the URL field is `urls.invoice_url`, not
+      // `urls.customer_portal`.  invoice_url is a signed per-customer
+      // link to the LS-hosted invoice page, which exposes "Update
+      // payment method" as an action — exactly what we want.  We
+      // still check `customer_portal` first in case LS extends the
+      // payload shape in the future.
       const email = String(a.user_email ?? "");
       const name = String(a.user_name ?? "");
-      // LS includes `renews_at` for the next retry attempt — quote
-      // that date so the email has a concrete deadline ("If we can't
-      // process the payment by <date>, Pro features will pause").
+      // For payment_failed, `renews_at` isn't directly on the invoice
+      // attributes — the retry timing is implicit in LS's dunning
+      // schedule (~7 days).  Quote `updated_at` (last retry attempt)
+      // when nothing better is available so the email at least has
+      // a recent reference point.  Both kept null → email softens
+      // wording to "after a few retries" instead of a dated deadline.
       const renewsAt = a.renews_at ?? null;
       const exp =
         typeof renewsAt === "string" && renewsAt.length > 0
           ? renewsAt.slice(0, 10)
           : null;
-      // LS embeds the customer-portal URL under `urls.customer_portal`
-      // on subscription events — that's the link the user clicks to
-      // update their card.  Fall back to /pricing if absent so the
-      // email still has a useful CTA.
-      const urls = (a.urls ?? {}) as { customer_portal?: string };
-      const portalUrl = urls.customer_portal;
+      const urls = (a.urls ?? {}) as {
+        customer_portal?: string;
+        invoice_url?: string;
+      };
+      const portalUrl = urls.customer_portal ?? urls.invoice_url;
       if (!email) {
         return {
           kind: "ignore",
