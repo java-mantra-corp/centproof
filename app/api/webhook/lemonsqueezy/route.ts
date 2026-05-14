@@ -51,6 +51,7 @@ import { sendEmail } from "@/lib/webhook/email";
 import {
   renderCancelEmail,
   renderLicenseEmail,
+  renderPaymentFailedEmail,
 } from "@/lib/webhook/templates";
 
 // Node runtime gives us nicer error traces in Vercel logs than Edge.
@@ -183,6 +184,40 @@ export async function POST(request: Request): Promise<Response> {
       resendApiKey,
     );
     console.log("[webhook] cancel email sent", { email: event.email });
+    return new Response("ok\n");
+  }
+
+  // ── 6. Payment failed → branded follow-up to LS dunning ──────────
+  // LS retries automatically and sends its own generic emails; ours
+  // is the branded version that points at the LS customer portal so
+  // the user knows exactly where to update their card.
+  if (event.kind === "payment_failed") {
+    const { subject, text, html } = renderPaymentFailedEmail({
+      name: event.name,
+      exp: event.exp,
+      // accountUrl is /pricing — that's the right fallback when LS's
+      // customer-portal URL is missing from the event payload (rare,
+      // but possible when the subscription is freshly created or LS
+      // schema changes).
+      portalUrl: event.portalUrl ?? accountUrl,
+      accountUrl,
+      supportEmail,
+    });
+    await sendEmail(
+      {
+        to: event.email,
+        fromEmail,
+        subject,
+        text,
+        html,
+        replyTo: supportEmail,
+      },
+      resendApiKey,
+    );
+    console.log("[webhook] payment_failed email sent", {
+      email: event.email,
+      hasPortalUrl: !!event.portalUrl,
+    });
     return new Response("ok\n");
   }
 

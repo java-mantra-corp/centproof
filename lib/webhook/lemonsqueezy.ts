@@ -98,26 +98,32 @@ export type LicenseType = "monthly" | "lifetime";
  * are silent-log.
  */
 export interface ActionableWebhookEvent {
-  kind: "issue" | "cancel";
+  kind: "issue" | "cancel" | "payment_failed";
   /** Buyer email — destination of our email + identity for the
    *  license_key activation in the desktop app.  Comes from the
    *  license_key's customer_email / user_email field on
    *  license_key_created, or the subscription's user_email on
-   *  cancellation. */
+   *  cancellation / payment_failed. */
   email: string;
   /** Buyer's display name — email greeting. */
   name: string;
   /** Stable LemonSqueezy ID for support lookups. */
   purchaseId: string;
-  /** Pro Monthly vs Pro Lifetime — set on `issue`, defaulted on `cancel`. */
+  /** Pro Monthly vs Pro Lifetime — set on `issue`, defaulted on `cancel`
+   *  and `payment_failed` (always monthly for those). */
   type: LicenseType;
   /** The actual license key string LS generated.  Only present on
    *  `kind: "issue"` — the buyer pastes this exact string into
    *  Preferences > License in the desktop app. */
   licenseKey?: string;
   /** ISO YYYY-MM-DD expiry.  null for lifetime; the cancellation flow
-   *  uses LS's `ends_at` so the user knows when access drops. */
+   *  uses LS's `ends_at` so the user knows when access drops.  On
+   *  `payment_failed` this is the date the next retry attempt happens
+   *  (LS's `renews_at`) so the email can quote a concrete deadline. */
   exp: string | null;
+  /** Customer-portal URL for updating billing.  Only set on
+   *  `payment_failed` — the user clicks this to fix their card. */
+  portalUrl?: string;
 }
 
 export interface IgnoredWebhookEvent {
@@ -189,14 +195,25 @@ export function parseLemonSqueezyEvent(
       const licenseKey = String(a.key ?? "");
       const email = String(a.user_email ?? a.customer_email ?? "");
       const name = String(a.user_name ?? a.customer_name ?? "");
+      // LS quirk: license_key_created events expose `product_id` but
+      // not `variant_id` (verified empirically against the v0.1.1 test
+      // purchase — see the payload archive in /docs/lemonsqueezy/).
+      // Other events (order_created) DO include variant_id.  Look up
+      // both so the same env-var map handles either id type — callers
+      // just put their product IDs and/or variant IDs in
+      // LEMONSQUEEZY_VARIANT_MAP.  The kept-as-fallback name "variant"
+      // is a v0.1.1 holdover; functionally it's now an id-map.
       const variantId = String(a.variant_id ?? "");
-      // LS doesn't ship the type directly on license_key_created —
-      // resolve via the variant map (set in env).  Default to
-      // lifetime when expires_at is null (LS's convention), else
-      // monthly.
+      const productId = String(a.product_id ?? "");
+      // Resolve via the id map first.  Default to lifetime when
+      // expires_at is null (LS's convention for one-time keys) — but
+      // this fallback is unreliable for subscriptions (LS keeps
+      // subscription license expires_at null too), so the map should
+      // always cover the live product/variant ids.
       const expiresAt = a.expires_at ?? null;
       const type: LicenseType =
         variantMap[variantId] ??
+        variantMap[productId] ??
         (expiresAt === null || expiresAt === "" ? "lifetime" : "monthly");
       const exp =
         typeof expiresAt === "string" && expiresAt.length > 0
@@ -238,6 +255,57 @@ export function parseLemonSqueezyEvent(
         purchaseId,
         type: "monthly",
         exp,
+      };
+    }
+
+    case "subscription_payment_failed": {
+      // LS retries failed payments a few times over ~7 days, sending
+      // its own generic dunning emails.  Those land in spam too often
+      // to rely on alone — we send a branded follow-up pointing at
+      // the LS customer portal so the user can update their card
+      // before they lose Pro access.
+      //
+      // Important: this event delivers a `subscription-invoices`
+      // resource (NOT a `subscriptions` resource).  Verified against
+      // the LS test-mode simulated event — webhook_id a1c6049d.
+      // That means the URL field is `urls.invoice_url`, not
+      // `urls.customer_portal`.  invoice_url is a signed per-customer
+      // link to the LS-hosted invoice page, which exposes "Update
+      // payment method" as an action — exactly what we want.  We
+      // still check `customer_portal` first in case LS extends the
+      // payload shape in the future.
+      const email = String(a.user_email ?? "");
+      const name = String(a.user_name ?? "");
+      // For payment_failed, `renews_at` isn't directly on the invoice
+      // attributes — the retry timing is implicit in LS's dunning
+      // schedule (~7 days).  Quote `updated_at` (last retry attempt)
+      // when nothing better is available so the email at least has
+      // a recent reference point.  Both kept null → email softens
+      // wording to "after a few retries" instead of a dated deadline.
+      const renewsAt = a.renews_at ?? null;
+      const exp =
+        typeof renewsAt === "string" && renewsAt.length > 0
+          ? renewsAt.slice(0, 10)
+          : null;
+      const urls = (a.urls ?? {}) as {
+        customer_portal?: string;
+        invoice_url?: string;
+      };
+      const portalUrl = urls.customer_portal ?? urls.invoice_url;
+      if (!email) {
+        return {
+          kind: "ignore",
+          reason: "subscription_payment_failed missing email",
+        };
+      }
+      return {
+        kind: "payment_failed",
+        email,
+        name: name || email,
+        purchaseId,
+        type: "monthly",
+        exp,
+        portalUrl,
       };
     }
 

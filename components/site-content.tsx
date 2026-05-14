@@ -316,7 +316,7 @@ const launchCoupon = presentOrFallback(
 );
 
 /** Append the launch coupon to the lifetime URL when configured.  This
- *  is what powers the "$30 launch lifetime" link during the first 30
+ *  is what powers the "$29 launch lifetime" link during the first 30
  *  days after public launch. */
 const lifetimeUrl =
   lifetimeBase !== SUPPORT_FALLBACK && launchCoupon
@@ -350,7 +350,7 @@ export const pricingPlans = [
     ctaExternal: lifetimeUrl !== SUPPORT_FALLBACK,
     badge: "Best value",
     launchPriceNote: launchCoupon
-      ? "$30 launch lifetime for the first 30 days"
+      ? "$29 launch lifetime for the first 30 days"
       : undefined,
     featured: true,
     bullets: [
@@ -358,7 +358,7 @@ export const pricingPlans = [
       "Unlimited Ask CentProof questions",
       "Full local AI features",
       "CSV / OFX / QFX / JSON / PDF exports",
-      "Up to 3 Macs",
+      "Up to 2 Macs",
       "One year of updates and support",
       "Major upgrades may be optional paid upgrades later",
     ],
@@ -407,7 +407,7 @@ export const pricingFaqs = [
   },
   {
     question: "Can I use it on multiple Macs?",
-    answer: "Pro Lifetime includes up to 3 Macs. Pro Monthly includes 1 Mac.",
+    answer: "Pro Lifetime includes up to 2 Macs. Pro Monthly includes 1 Mac.",
   },
   {
     question: "How are purchases handled?",
@@ -454,7 +454,7 @@ export const faqs = [
   },
   {
     question: "What does Pro Lifetime include?",
-    answer: "Pro Lifetime includes unlimited statements, accounts, transactions, Ask CentProof questions, local AI features, exports, up to 3 Macs, and one year of updates and support.",
+    answer: "Pro Lifetime includes unlimited statements, accounts, transactions, Ask CentProof questions, local AI features, exports, up to 2 Macs, and one year of updates and support.",
   },
   {
     question: "How do license keys work?",
