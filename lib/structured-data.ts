@@ -47,7 +47,7 @@ export function softwareApplicationSchema() {
         availability: "https://schema.org/InStock",
         url: `${SITE_URL}/pricing`,
         description:
-          "Permanent use of the version you buy. Includes 12 months of feature updates and support. Up to 3 Macs.",
+          "Permanent use of the version you buy. Includes 12 months of feature updates and support. Up to 2 Macs.",
       },
       {
         "@type": "Offer",

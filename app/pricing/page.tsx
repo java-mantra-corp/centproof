@@ -11,7 +11,7 @@ import {
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Free Test Mode, Pro Lifetime $49 one-time, or Pro Monthly $5/mo. Launch lifetime $30 for the first 30 days. Direct purchase via LemonSqueezy.",
+    "Free Test Mode, Pro Lifetime $49 one-time, or Pro Monthly $5/mo. Launch lifetime $29 for the first 30 days. Direct purchase via LemonSqueezy.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "CentProof Pricing",
@@ -60,7 +60,7 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-10 rounded-2xl border border-[#0F766E]/20 bg-[#ECFDF5] px-5 py-4 text-sm font-semibold text-[#0F766E]">
-          Launch price: $30 lifetime
+          Launch price: $29 lifetime
           {LAUNCH_COUPON_ENDS ? ` through ${LAUNCH_COUPON_ENDS}` : " for the first 30 days"}.
           Then $49 one-time.
         </div>
@@ -105,7 +105,7 @@ export default function PricingPage() {
               Your data stays accessible →
             </p>
             <p className="mt-2 text-xs leading-5 text-[#475569]">
-              Up to 3 Macs on Pro Lifetime. Existing imports stay readable even if you never upgrade.
+              Up to 2 Macs on Pro Lifetime. Existing imports stay readable even if you never upgrade.
             </p>
           </Link>
         </div>
