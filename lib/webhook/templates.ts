@@ -183,6 +183,84 @@ If something pushed you out, we'd love to hear what.  Just reply to this email �
   return { subject, text, html };
 }
 
+interface PaymentFailedEmailVars {
+  name: string;
+  /** Next-retry date from LS's `renews_at` (ISO YYYY-MM-DD).  When LS
+   *  doesn't ship one, we soften the wording to "in a few days". */
+  exp: string | null;
+  /** Direct link to LS customer portal where the user can update
+   *  their card.  Falls back to /pricing if the LS event omitted it. */
+  portalUrl: string;
+  accountUrl: string;
+  supportEmail: string;
+}
+
+/**
+ * Branded follow-up to LS's generic dunning email.  LS retries failed
+ * charges a few times over ~7 days; if the user does nothing, their
+ * license becomes inactive and the next time they open CentProof
+ * they're dropped to Free Tier with a "Subscription expired" banner.
+ *
+ * We send this so the user sees a recognisable CentProof email
+ * specifically — LS's own dunning emails look generic and get
+ * spam-foldered too often.  Subject line is deliberately calm:
+ * "couldn't process your latest payment", not "ACTION REQUIRED" —
+ * LS will keep retrying and most card failures are recoverable
+ * (expired card, momentary network issue) without any user panic.
+ */
+export function renderPaymentFailedEmail(
+  vars: PaymentFailedEmailVars,
+): { subject: string; text: string; html: string } {
+  const subject = "We couldn't process your latest CentProof payment";
+  const greetingName = vars.name.split(/\s+/)[0] || vars.name;
+  const deadlinePhrase = vars.exp
+    ? `If we can't process the payment by ${vars.exp}`
+    : "If we can't process the payment after a few retries";
+
+  const text = `Hi ${greetingName},
+
+LemonSqueezy (our payment processor) couldn't charge your card for the latest CentProof Pro Monthly renewal.  Most often this is an expired card, a temporary bank decline, or a saved card that needs re-authorising.
+
+We'll retry the charge automatically a few times over the next few days.  ${deadlinePhrase}, your Pro features will pause and CentProof will drop back to Free Test Mode (your imported data stays exactly where it is — only new imports / Ask CentProof / full exports get gated).
+
+To fix it now:
+  1. Open the customer portal:
+     ${vars.portalUrl}
+  2. Update or re-add your payment method
+  3. The next retry will succeed and Pro stays active
+
+If you'd rather cancel, the customer portal has a cancel link too — no charge, no questions.
+
+Need help?  Reply to this email or write to ${vars.supportEmail}.  We answer every message ourselves.
+
+— Java Mantra Corp
+   centproof.com
+`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, system-ui, 'Helvetica Neue', sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; color: #1e293b; line-height: 1.55;">
+  <p>Hi ${escapeHtml(greetingName)},</p>
+
+  <p>LemonSqueezy (our payment processor) couldn't charge your card for the latest CentProof Pro Monthly renewal.  Most often this is an expired card, a temporary bank decline, or a saved card that needs re-authorising.</p>
+
+  <p>We'll retry the charge automatically a few times over the next few days.  <strong>${escapeHtml(deadlinePhrase)}</strong>, your Pro features will pause and CentProof will drop back to Free Test Mode (your imported data stays exactly where it is — only new imports / Ask CentProof / full exports get gated).</p>
+
+  <p style="text-align: center; margin: 28px 0;">
+    <a href="${escapeAttr(vars.portalUrl)}" style="display: inline-block; background: #0ea5e9; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600;">Update payment method</a>
+  </p>
+
+  <p style="color: #64748b; font-size: 13px;">If you'd rather cancel, the customer portal has a cancel link too — no charge, no questions.</p>
+
+  <p style="color: #64748b; font-size: 13px;">Need help?  Reply to this email or write to <a href="mailto:${escapeAttr(vars.supportEmail)}" style="color: #0ea5e9;">${escapeHtml(vars.supportEmail)}</a>.  We answer every message ourselves.</p>
+
+  <p style="color: #94a3b8; font-size: 11px; margin-top: 32px;">— Java Mantra Corp · <a href="https://centproof.com" style="color: #94a3b8;">centproof.com</a></p>
+</body>
+</html>`;
+
+  return { subject, text, html };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

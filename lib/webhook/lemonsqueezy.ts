@@ -98,26 +98,32 @@ export type LicenseType = "monthly" | "lifetime";
  * are silent-log.
  */
 export interface ActionableWebhookEvent {
-  kind: "issue" | "cancel";
+  kind: "issue" | "cancel" | "payment_failed";
   /** Buyer email — destination of our email + identity for the
    *  license_key activation in the desktop app.  Comes from the
    *  license_key's customer_email / user_email field on
    *  license_key_created, or the subscription's user_email on
-   *  cancellation. */
+   *  cancellation / payment_failed. */
   email: string;
   /** Buyer's display name — email greeting. */
   name: string;
   /** Stable LemonSqueezy ID for support lookups. */
   purchaseId: string;
-  /** Pro Monthly vs Pro Lifetime — set on `issue`, defaulted on `cancel`. */
+  /** Pro Monthly vs Pro Lifetime — set on `issue`, defaulted on `cancel`
+   *  and `payment_failed` (always monthly for those). */
   type: LicenseType;
   /** The actual license key string LS generated.  Only present on
    *  `kind: "issue"` — the buyer pastes this exact string into
    *  Preferences > License in the desktop app. */
   licenseKey?: string;
   /** ISO YYYY-MM-DD expiry.  null for lifetime; the cancellation flow
-   *  uses LS's `ends_at` so the user knows when access drops. */
+   *  uses LS's `ends_at` so the user knows when access drops.  On
+   *  `payment_failed` this is the date the next retry attempt happens
+   *  (LS's `renews_at`) so the email can quote a concrete deadline. */
   exp: string | null;
+  /** Customer-portal URL for updating billing.  Only set on
+   *  `payment_failed` — the user clicks this to fix their card. */
+  portalUrl?: string;
 }
 
 export interface IgnoredWebhookEvent {
@@ -249,6 +255,45 @@ export function parseLemonSqueezyEvent(
         purchaseId,
         type: "monthly",
         exp,
+      };
+    }
+
+    case "subscription_payment_failed": {
+      // LS retries failed payments a few times over ~7 days, sending
+      // its own generic dunning emails.  Those land in spam too often
+      // to rely on alone — we send a branded follow-up pointing at
+      // the LS customer portal so the user can update their card
+      // before they lose Pro access.
+      const email = String(a.user_email ?? "");
+      const name = String(a.user_name ?? "");
+      // LS includes `renews_at` for the next retry attempt — quote
+      // that date so the email has a concrete deadline ("If we can't
+      // process the payment by <date>, Pro features will pause").
+      const renewsAt = a.renews_at ?? null;
+      const exp =
+        typeof renewsAt === "string" && renewsAt.length > 0
+          ? renewsAt.slice(0, 10)
+          : null;
+      // LS embeds the customer-portal URL under `urls.customer_portal`
+      // on subscription events — that's the link the user clicks to
+      // update their card.  Fall back to /pricing if absent so the
+      // email still has a useful CTA.
+      const urls = (a.urls ?? {}) as { customer_portal?: string };
+      const portalUrl = urls.customer_portal;
+      if (!email) {
+        return {
+          kind: "ignore",
+          reason: "subscription_payment_failed missing email",
+        };
+      }
+      return {
+        kind: "payment_failed",
+        email,
+        name: name || email,
+        purchaseId,
+        type: "monthly",
+        exp,
+        portalUrl,
       };
     }
 
