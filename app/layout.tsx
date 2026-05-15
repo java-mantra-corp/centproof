@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import "./globals.css";
 
 const SITE_URL =
@@ -79,6 +80,9 @@ export default function RootLayout({
         {children}
         <StructuredData />
         <Analytics />
+        {/* Custom-event tracker (Pass 5.0).  Fires page_view on
+            every route change, exposes track() for click handlers. */}
+        <AnalyticsTracker />
       </body>
     </html>
   );

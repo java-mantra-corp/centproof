@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/components/AnalyticsTracker";
+
 /**
  * Drop-in replacement for the external "Buy" anchor on the pricing
  * cards.  At click time it reads the current URL's `?opp=...` query
@@ -51,6 +53,17 @@ export function CheckoutLink({
 
     const params = new URLSearchParams(window.location.search);
     const opp = params.get("opp");
+
+    // Fire buy_click to MindSpire analytics (Pass 5.0).  Captured
+    // BEFORE we early-return for the no-opp case — we want to track
+    // EVERY checkout-button click for the conversion funnel, not
+    // just ConvoProof-attributed ones.
+    trackEvent("buy_click", {
+      plan: dataPlan,                       // "Pro Lifetime" | "Pro Monthly"
+      attributed: opp ? true : false,       // came via ConvoProof tracking link
+      opp: opp ?? undefined,                // opportunity id if attributed
+    });
+
     if (!opp) return; // no tracking link — leave href as-is
 
     e.preventDefault();

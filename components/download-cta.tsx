@@ -1,6 +1,7 @@
 "use client";
 
 import { track } from "@vercel/analytics";
+import { trackEvent } from "@/components/AnalyticsTracker";
 
 /**
  * Client-side wrapper around the .dmg download anchor.  Fires a
@@ -27,6 +28,13 @@ export function DownloadDmgButton({
       data-cta="download-dmg"
       onClick={() => {
         track("dmg_download_clicked", {
+          version: versionLabel || "unknown",
+        });
+        // Fire to MindSpire's analytics endpoint too (Pass 5.0).
+        // Two destinations is intentional: Vercel Analytics for
+        // free dashboards, our own table for queryable funnels +
+        // cross-product correlation later.
+        trackEvent("download_click", {
           version: versionLabel || "unknown",
         });
       }}
