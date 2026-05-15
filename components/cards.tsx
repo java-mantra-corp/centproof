@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
+import { CheckoutLink } from "@/components/CheckoutLink";
 
 export function SectionIntro({
   eyebrow,
@@ -136,15 +137,9 @@ export function PricingCard({
         </p>
       ) : null}
       {ctaExternal ? (
-        <a
-          href={ctaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={ctaClass}
-          data-plan={name}
-        >
+        <CheckoutLink href={ctaUrl} className={ctaClass} dataPlan={name}>
           {cta}
-        </a>
+        </CheckoutLink>
       ) : (
         <Link href={ctaUrl} className={ctaClass} data-plan={name}>
           {cta}
