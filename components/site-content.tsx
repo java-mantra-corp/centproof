@@ -13,8 +13,9 @@ export const navItems = [
   ["Security", "/security"],
   ["Banks", "/banks"],
   ["Pricing", "/pricing"],
-  ["FAQ", "/faq"],
   ["Guides", "/guides"],
+  ["About", "/about"],
+  ["FAQ", "/faq"],
   ["Changelog", "/changelog"],
   // Download lives in the prominent right-aligned button in site-header
   // (not the nav row), so it isn't duplicated here.
