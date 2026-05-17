@@ -23,6 +23,13 @@ export const metadata: Metadata = {
  */
 const guides = [
   {
+    slug: "pdf-statement-formats-by-bank",
+    title: "PDF statement formats by bank — why every one looks different",
+    description:
+      "A field guide to how seven major US banks lay out their monthly PDFs. The historical reasons each one diverged, what's the same underneath, and the parsing quirks each one ships with.",
+    readTime: "9 min read",
+  },
+  {
     slug: "how-to-reconcile-a-bank-statement",
     title: "How to reconcile a bank statement (without spreadsheets)",
     description:
