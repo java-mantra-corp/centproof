@@ -23,6 +23,13 @@ export const metadata: Metadata = {
  */
 const guides = [
   {
+    slug: "five-questions-bank-password-app",
+    title: "Five questions to ask before you give an app your bank password",
+    description:
+      "A plain-English checklist for evaluating any personal-finance app that wants to log into your bank. Useful even if you decide to keep using what you have.",
+    readTime: "7 min read",
+  },
+  {
     slug: "anatomy-of-a-bank-pdf-statement",
     title: "What's actually in a bank PDF statement",
     description:

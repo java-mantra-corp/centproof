@@ -20,6 +20,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/banks", priority: 0.7, changeFrequency: "weekly" },
     { path: "/guides", priority: 0.65, changeFrequency: "monthly" },
     {
+      // New guides go at this same priority — long-form content earns
+      // its position over time via inbound links, not by sitemap weight.
+      path: "/guides/five-questions-bank-password-app",
+      priority: 0.65,
+      changeFrequency: "monthly",
+    },
+    {
       path: "/guides/anatomy-of-a-bank-pdf-statement",
       priority: 0.65,
       changeFrequency: "monthly",
