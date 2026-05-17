@@ -23,6 +23,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       // New guides go at this same priority — long-form content earns
       // its position over time via inbound links, not by sitemap weight.
+      path: "/guides/how-to-reconcile-a-bank-statement",
+      priority: 0.65,
+      changeFrequency: "monthly",
+    },
+    {
       path: "/guides/five-questions-bank-password-app",
       priority: 0.65,
       changeFrequency: "monthly",

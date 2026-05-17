@@ -23,6 +23,13 @@ export const metadata: Metadata = {
  */
 const guides = [
   {
+    slug: "how-to-reconcile-a-bank-statement",
+    title: "How to reconcile a bank statement (without spreadsheets)",
+    description:
+      "What reconciliation actually means, the only formula you need to remember, and three different ways to do it depending on how much typing you want to do.",
+    readTime: "8 min read",
+  },
+  {
     slug: "five-questions-bank-password-app",
     title: "Five questions to ask before you give an app your bank password",
     description:
