@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
 import { ProductImagePlaceholder, SectionIntro } from "@/components/cards";
 import { PageShell } from "@/components/page-shell";
+import { PodcastEmbed } from "@/components/podcast-embed";
 import { productSections } from "@/components/site-content";
+
+// Podcast metadata — populated when NEXT_PUBLIC_PODCAST_EPISODE_ID is
+// set on Vercel.  Until then PodcastEmbed renders nothing and the
+// "Go deeper" section just shows the PDF download card.
+const PODCAST_EPISODE_ID = (
+  process.env.NEXT_PUBLIC_PODCAST_EPISODE_ID ?? ""
+).trim();
+const PODCAST_TITLE =
+  (process.env.NEXT_PUBLIC_PODCAST_TITLE ?? "").trim() ||
+  "Why we built CentProof";
+const PODCAST_DURATION =
+  (process.env.NEXT_PUBLIC_PODCAST_DURATION ?? "").trim() || undefined;
 
 export const metadata: Metadata = {
   title: "Product tour",
@@ -67,6 +80,73 @@ export default function ProductPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* "Go deeper" — the natural closer for visitors who scrolled
+          through the entire product tour and want longer-form content.
+          The grid is responsive so the layout stays balanced whether
+          PodcastEmbed renders (env var set) or returns null (default
+          state, only PDF card visible). */}
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+        <SectionIntro
+          eyebrow="Go deeper"
+          title="Hear the story. Read the brief."
+          body="Two longer-form ways to evaluate CentProof — a founder podcast covering why we built it and what's deliberately not in it, plus a 13-page product brief in PDF so you can read offline or send it around."
+        />
+        <div
+          className={`mt-10 grid gap-6 ${
+            PODCAST_EPISODE_ID ? "lg:grid-cols-2" : ""
+          }`}
+        >
+          <PodcastEmbed
+            episodeId={PODCAST_EPISODE_ID}
+            title={PODCAST_TITLE}
+            duration={PODCAST_DURATION}
+          />
+          {/* PDF download card.  No email gate — gating a privacy-
+              product's collateral behind an email form contradicts the
+              brand.  We can add an optional newsletter signup later
+              when there's actual list-management infrastructure for it. */}
+          <a
+            href="/CentProof_Private_Finance.pdf"
+            download
+            className="group flex items-start gap-4 rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition hover:border-[#0F766E] hover:shadow-md"
+          >
+            <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-[#CCFBF1] text-[#0F766E] transition group-hover:bg-[#5EEAD4]">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-6"
+                aria-hidden="true"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="12" y1="18" x2="12" y2="12" />
+                <polyline points="9 15 12 18 15 15" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#0F766E]">
+                Read the product brief
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-[#0F172A] group-hover:text-[#0F766E]">
+                CentProof — Private Finance
+              </h3>
+              <p className="mt-1 text-sm text-[#475569]">
+                13 pages · PDF · 6.5 MB
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[#475569]">
+                The full positioning, architecture, and feature deep-dive
+                in one downloadable document. Useful for sharing internally
+                or reading away from the browser.
+              </p>
+            </div>
+          </a>
         </div>
       </section>
     </PageShell>
