@@ -4,10 +4,10 @@ import {
   BankBadge,
   FeatureCard,
   PricingCard,
-  ProductImagePlaceholder,
   SectionIntro,
   TrustBadge,
 } from "@/components/cards";
+import { DemoVideo } from "@/components/demo-video";
 import { PageShell } from "@/components/page-shell";
 import {
   directDistributionBullets,
@@ -20,11 +20,17 @@ import {
   workflowSteps,
 } from "@/components/site-content";
 
+// Demo video — populated when NEXT_PUBLIC_DEMO_VIDEO_ID is set on
+// Vercel.  Until then the hero falls back to the static screenshot
+// (same visual as before this refactor).  See components/demo-video.tsx
+// for the click-to-load YouTube embed rationale.
+const DEMO_VIDEO_ID = (process.env.NEXT_PUBLIC_DEMO_VIDEO_ID ?? "").trim();
+
 export const metadata: Metadata = {
   // Homepage uses the layout's default title (no template).
-  title: "CentProof | Private finance, proved to the cent.",
+  title: "CentProof | Private finance software that stays on your Mac.",
   description:
-    "Local-first Mac app for bank PDF statements, reconciliation, search, local AI, and auditable reports. No bank password. No cloud sync.",
+    "CentProof reads your bank PDFs, reconciles to the cent, and answers your money questions — all on your Mac, never in someone else's cloud. No bank password. No cloud sync. Local AI by default.",
   alternates: { canonical: "/" },
 };
 
@@ -37,11 +43,12 @@ export default function Home() {
             Direct download for macOS
           </p>
           <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[1.03] tracking-tight text-[#0F172A] sm:text-6xl lg:text-7xl">
-            Private finance, proved to the cent.
+            Personal finance software lost the plot.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[#475569]">
-            CentProof reads your bank and credit-card PDF statements, finds the
-            patterns, and answers your money questions — entirely on your Mac.
+            CentProof reads the PDF statements your bank already gives you,
+            reconciles to the cent, and answers your money questions — all on
+            your Mac, never in someone else&apos;s cloud.
           </p>
           <p className="mt-5 text-sm font-semibold text-[#0F172A]">
             No bank password. No cloud sync. Local AI by default.
@@ -67,11 +74,10 @@ export default function Home() {
           </div>
         </div>
         <div className="space-y-4">
-          <ProductImagePlaceholder
-            title="CentProof app screenshot"
-            dimensions="1600×1000"
-            description="CentProof main view: Statements, Search, Ask CentProof, and local AI status — all on your Mac."
-            imagePath="/images/product/hero-app.png"
+          <DemoVideo
+            videoId={DEMO_VIDEO_ID}
+            title="CentProof — 2-minute product demo"
+            posterPath="/images/product/hero-app.png"
           />
           <div className="grid gap-3 sm:grid-cols-3">
             {[
