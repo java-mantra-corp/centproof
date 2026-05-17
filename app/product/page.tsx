@@ -4,11 +4,15 @@ import { PageShell } from "@/components/page-shell";
 import { PodcastEmbed } from "@/components/podcast-embed";
 import { productSections } from "@/components/site-content";
 
-// Podcast metadata — populated when NEXT_PUBLIC_PODCAST_EPISODE_ID is
-// set on Vercel.  Until then PodcastEmbed renders nothing and the
-// "Go deeper" section just shows the PDF download card.
-const PODCAST_EPISODE_ID = (
-  process.env.NEXT_PUBLIC_PODCAST_EPISODE_ID ?? ""
+// Podcast metadata — populated when NEXT_PUBLIC_PODCAST_SPOTIFY_URL
+// is set on Vercel.  The env var accepts either a show URL
+// (https://open.spotify.com/show/<id>) or an episode URL
+// (https://open.spotify.com/episode/<id>) — paste whichever URL
+// Spotify gives you on the Share menu.  Until then PodcastEmbed
+// renders nothing and the "Go deeper" section just shows the PDF
+// download card.
+const PODCAST_SPOTIFY_URL = (
+  process.env.NEXT_PUBLIC_PODCAST_SPOTIFY_URL ?? ""
 ).trim();
 const PODCAST_TITLE =
   (process.env.NEXT_PUBLIC_PODCAST_TITLE ?? "").trim() ||
@@ -96,11 +100,11 @@ export default function ProductPage() {
         />
         <div
           className={`mt-10 grid gap-6 ${
-            PODCAST_EPISODE_ID ? "lg:grid-cols-2" : ""
+            PODCAST_SPOTIFY_URL ? "lg:grid-cols-2" : ""
           }`}
         >
           <PodcastEmbed
-            episodeId={PODCAST_EPISODE_ID}
+            spotifyUrl={PODCAST_SPOTIFY_URL}
             title={PODCAST_TITLE}
             duration={PODCAST_DURATION}
           />
