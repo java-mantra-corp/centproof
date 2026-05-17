@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { GoogleTag } from "@/components/GoogleTag";
 import "./globals.css";
 
 const SITE_URL =
@@ -84,6 +85,10 @@ export default function RootLayout({
         {/* Custom-event tracker (Pass 5.0).  Fires page_view on
             every route change, exposes track() for click handlers. */}
         <AnalyticsTracker />
+        {/* Google Ads conversion tracking — renders nothing unless
+            NEXT_PUBLIC_GOOGLE_TAG_ID is set on Vercel.  See the
+            component's docstring for the privacy stance. */}
+        <GoogleTag />
       </body>
     </html>
   );
