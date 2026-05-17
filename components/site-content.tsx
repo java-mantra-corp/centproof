@@ -2,9 +2,6 @@ import {
   BalanceIcon,
   FileTextIcon,
   ReportIcon,
-  RestoreIcon,
-  SearchIcon,
-  ShieldIcon,
   SparkIcon,
   TagIcon,
   VaultIcon,
@@ -122,75 +119,56 @@ export const personas = [
   },
 ];
 
+/**
+ * Homepage features grid.  v0.1.5 marketing refresh: trimmed from 14
+ * generic cards (read like a spec sheet, the eye glazes over after 6)
+ * to 6 outcome-focused cards (each one names a concrete result the
+ * buyer cares about).  The deeper feature-by-feature walkthrough still
+ * lives on /product via `productSections` below — this list is the
+ * homepage taste-test, not the catalog.
+ *
+ * Editing rules:
+ *   - Keep this list at 4-6 items.  Less than 4 feels sparse, more
+ *     than 6 brings back the dump-truck-of-features problem.
+ *   - Title should be a HOOK, not a category name ("Tag once, applies
+ *     forever" beats "Smart Tagging").
+ *   - Body should name a concrete outcome the visitor can imagine
+ *     themselves doing — a specific merchant, a specific question,
+ *     a specific dollar figure.
+ *   - Move full feature explanations to productSections (the
+ *     /product page).  Don't add screenshots here — the hero already
+ *     has the demo video; adding more imagery makes this section
+ *     compete for attention.
+ */
 export const homepageFeatures = [
   {
-    title: "Statement Import & Parsing",
-    body: "Import bank and credit-card PDFs, then extract transactions, dates, descriptions, amounts, and balances.",
+    title: "PDF in, verified data out",
+    body: "Drop in the same PDF statements you already download for taxes. CentProof reads BofA, Chase, Citi, Apple Card, Amex, Discover, Capital One, US Bank, and Wells Fargo — then reconciles each statement against its own opening and closing balance. Math is verified before you trust the data.",
     icon: <FileTextIcon />,
   },
   {
-    title: "Reconciliation",
-    body: "Opening and closing balances are checked before imported data becomes trusted.",
-    icon: <BalanceIcon />,
-  },
-  {
-    title: "Transactions View",
-    body: "Search and filter by date, account, entity, category, amount, direction, and source.",
-    icon: <SearchIcon />,
-  },
-  {
-    title: "Ask CentProof",
-    body: "Ask plain-English money questions and verify answers against source rows.",
-    icon: <SparkIcon />,
-  },
-  {
-    title: "Recurring Subscriptions",
-    body: "Find recurring charges across imported statement history.",
-    icon: <ReportIcon />,
-  },
-  {
-    title: "Price Watch",
-    body: "Spot merchant price changes, annual fees, and subscription increases.",
-    icon: <BalanceIcon />,
-  },
-  {
-    title: "Anomaly Detection",
-    body: "Flag charges that look unusual for your own merchants and categories.",
-    icon: <ShieldIcon />,
-  },
-  {
-    title: "What Changed",
-    body: "Compare month to month and see the rows behind the change.",
-    icon: <ReportIcon />,
-  },
-  {
-    title: "Cash Flow",
-    body: "View actual daily income and spending from imported statement data.",
-    icon: <ReportIcon />,
-  },
-  {
-    title: "Trip Report",
-    body: "Group travel transactions and supporting rows into exportable reports.",
-    icon: <ReportIcon />,
-  },
-  {
-    title: "Settlement Report",
-    body: "Build shareable settlement exports from reconciled transactions.",
-    icon: <ReportIcon />,
-  },
-  {
-    title: "Cleanup Inbox",
-    body: "Review raw merchant names and apply clean tags in batches.",
-    icon: <RestoreIcon />,
-  },
-  {
-    title: "Entities and Categories",
-    body: "Normalize merchants, people, accounts, and spending categories.",
+    title: "Tag once, applies forever",
+    body: "Raw bank descriptions like 'AMZN MKTP US*4F8H2' are hostile to humans. CentProof's Smart Tagging learns 'AMZN MKTP' means Amazon — and applies it to next month's slightly-different string automatically. You stay in control of the final approval.",
     icon: <TagIcon />,
   },
   {
-    title: "Local Backup & Export",
-    body: "Keep local files, back them up yourself, and export standard formats anytime.",
+    title: "Ask plain-English questions. Answers stay on your Mac.",
+    body: "A 3-billion-parameter AI runs natively on Apple Silicon. Zero cloud calls to OpenAI or Anthropic. Ask 'how much did I spend on groceries last quarter' and CentProof returns the answer with source rows so you can check the math.",
+    icon: <SparkIcon />,
+  },
+  {
+    title: "Catch the subscriptions you forgot you had.",
+    body: "Detect repeating charges across imported statement history — merchant, cadence, and amount changes. Spot subscription price hikes, annual-fee bumps, and that one streaming service you've been paying for since 2022.",
+    icon: <BalanceIcon />,
+  },
+  {
+    title: "See exactly what changed since last month.",
+    body: "Compare any two periods and CentProof shows which merchants or categories drove the difference — with source rows. Useful for catching new subscriptions, unusual spending, and the 'wait, why was the credit card bill higher this month' moment.",
+    icon: <ReportIcon />,
+  },
+  {
+    title: "Standard exports. Zero lock-in.",
+    body: "Trip reports, settlement reports, search exports — plus universal CSV, OFX, QFX, JSON, and PDF outputs. Your data lives in a local SQLite database. If CentProof goes away tomorrow, your history is yours forever.",
     icon: <VaultIcon />,
   },
 ];
