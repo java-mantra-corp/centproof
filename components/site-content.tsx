@@ -68,6 +68,60 @@ export const workflowSteps = [
   ["Export reports", "Create CSV, JSON, OFX, QFX, and PDF reports from local data."],
 ];
 
+/**
+ * Buyer personas surfaced on the homepage between the workflow and
+ * features sections.  Pulled from the v0.1.5 product deck (slide 11
+ * "Built for the privacy-conscious and the unsyncable").
+ *
+ * Why these five specifically: each one represents a real reason
+ * someone abandons mainstream bank-aggregator finance apps —
+ * privacy stance, tax/contractor complexity, latency intolerance,
+ * a bank that simply can't be synced via Plaid, or a couple
+ * splitting expenses without paying per-seat SaaS fees.  When a
+ * visitor sees their own situation reflected back, they have
+ * permission to keep reading; without that mirror, generic-feature
+ * marketing slides past them.
+ *
+ * The icons are intentionally not 1:1 with the deck — the deck uses
+ * full-bleed illustrated icons that don't have web-quality SVG
+ * sources we can ship.  We map to the closest existing icons in
+ * components/icons.tsx so the section stays visually consistent
+ * with the rest of the site (FeatureCard, etc.) without a separate
+ * asset pipeline.
+ */
+export const personas = [
+  {
+    eyebrow: "The Privacy Pro",
+    title: "Engineers, lawyers, and anyone who refuses to hand a bank password to a third-party aggregator.",
+    body: "If a 'connect your bank' button is a hard no for you, CentProof never asks. It works from the same PDF statements you already download for taxes.",
+    icon: "shield" as const,
+  },
+  {
+    eyebrow: "The 1099 Freelancer",
+    title: "Solo workers stitching multiple clients, business and personal cards into one searchable history.",
+    body: "Drop in statements from every account, tag once with Smart Tagging, and search across years of activity. No cloud sync, no per-seat pricing.",
+    icon: "report" as const,
+  },
+  {
+    eyebrow: "The Mac Power User",
+    title: "Native speed, keyboard shortcuts, and zero web-wrapper latency.",
+    body: "Not Electron. Not a browser tab pretending to be a Mac app. CentProof is a Tauri-built Apple Silicon native binary that respects your machine.",
+    icon: "spark" as const,
+  },
+  {
+    eyebrow: "The Unsyncable Bank",
+    title: "Credit union members and foreign account holders whose banks constantly break Plaid integrations.",
+    body: "If your bank doesn't sync reliably with mainstream finance apps, CentProof works directly from the PDF — and you keep the same workflow whether your bank is Chase or a regional credit union.",
+    icon: "vault" as const,
+  },
+  {
+    eyebrow: "The Co-Mingled Couple",
+    title: "Partners splitting expenses across joint and individual accounts without per-seat SaaS bills.",
+    body: "Import statements from both partners' accounts on one Mac. Tag transactions by entity (Joint / Mine / Partner's) and run settlement reports without paying for every member separately.",
+    icon: "tag" as const,
+  },
+];
+
 export const homepageFeatures = [
   {
     title: "Statement Import & Parsing",

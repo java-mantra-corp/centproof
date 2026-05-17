@@ -3,22 +3,43 @@ import Link from "next/link";
 import {
   BankBadge,
   FeatureCard,
+  PersonaCard,
   PricingCard,
   SectionIntro,
   TrustBadge,
 } from "@/components/cards";
 import { DemoVideo } from "@/components/demo-video";
+import {
+  ReportIcon,
+  ShieldIcon,
+  SparkIcon,
+  TagIcon,
+  VaultIcon,
+} from "@/components/icons";
 import { PageShell } from "@/components/page-shell";
 import {
   directDistributionBullets,
   directDistributionTrust,
   heroTrust,
   homepageFeatures,
+  personas,
   pillars,
   pricingPlans,
   supportedBanks,
   workflowSteps,
 } from "@/components/site-content";
+
+// Persona-icon key → JSX node.  Kept in the page (not in site-content)
+// because site-content is plain data — importing JSX there forces
+// every consumer of site-content to be a client/server boundary
+// component too.  This map is tiny and only used here.
+const personaIcons = {
+  shield: <ShieldIcon className="size-5" />,
+  report: <ReportIcon className="size-5" />,
+  spark: <SparkIcon className="size-5" />,
+  vault: <VaultIcon className="size-5" />,
+  tag: <TagIcon className="size-5" />,
+} as const;
 
 // Demo video — populated when NEXT_PUBLIC_DEMO_VIDEO_ID is set on
 // Vercel.  Until then the hero falls back to the static screenshot
@@ -162,14 +183,35 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
         <SectionIntro
-          eyebrow="Features"
-          title="Statement-based finance, not a cloud feed."
-          body="CentProof is built around PDF import, reconciliation, local AI, source rows, and reports you control."
+          eyebrow="Who it's for"
+          title="Built for the privacy-conscious and the unsyncable."
+          body="If you've ever closed a finance app because it wanted your bank password, broke on your credit union, or felt like an Electron tab pretending to be a Mac app — you're who CentProof is built for."
         />
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {homepageFeatures.map((feature) => (
-            <FeatureCard key={feature.title} {...feature} />
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {personas.map((persona) => (
+            <PersonaCard
+              key={persona.eyebrow}
+              eyebrow={persona.eyebrow}
+              title={persona.title}
+              body={persona.body}
+              icon={personaIcons[persona.icon]}
+            />
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-[#E2E8F0] bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+          <SectionIntro
+            eyebrow="Features"
+            title="Statement-based finance, not a cloud feed."
+            body="CentProof is built around PDF import, reconciliation, local AI, source rows, and reports you control."
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {homepageFeatures.map((feature) => (
+              <FeatureCard key={feature.title} {...feature} />
+            ))}
+          </div>
         </div>
       </section>
 

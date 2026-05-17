@@ -67,6 +67,40 @@ export function FeatureCard({
   );
 }
 
+/**
+ * PersonaCard — a slightly heavier card variant used in the homepage
+ * "Who it's for" section.  Visually distinct from FeatureCard so the
+ * personas section reads as audience qualification (not just another
+ * feature list): two-line title (so each persona's tagline can breathe),
+ * eyebrow label above the title, slightly taller padding.
+ */
+export function PersonaCard({
+  eyebrow,
+  title,
+  body,
+  icon,
+}: {
+  eyebrow: string;
+  title: string;
+  body: string;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <article className="flex h-full flex-col rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition hover:border-[#0F766E]/40 hover:shadow-md">
+      {icon ? (
+        <div className="grid size-11 place-items-center rounded-xl bg-[#CCFBF1] text-[#0F766E]">
+          {icon}
+        </div>
+      ) : null}
+      <p className="mt-5 text-sm font-semibold text-[#0F766E]">{eyebrow}</p>
+      <h3 className="mt-2 text-base font-semibold leading-snug text-[#0F172A]">
+        {title}
+      </h3>
+      <p className="mt-3 text-sm leading-6 text-[#475569]">{body}</p>
+    </article>
+  );
+}
+
 export function PricingCard({
   name,
   price,
