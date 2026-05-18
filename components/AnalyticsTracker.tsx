@@ -31,7 +31,7 @@
  * outage MUST NOT degrade user experience on the site.
  */
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 const ENDPOINT =
@@ -92,14 +92,41 @@ export function trackEvent(
 /**
  * Mount once at the app root (via app/layout.tsx).  Auto-fires
  * page_view on every route change.  No props.
+ *
+ * Pass 5.0a: guards against double-fires of the SAME path within
+ * a single mount cycle.  Real-world observation showed pairs of
+ * page_view events 26-150 ms apart in the analytics DB — most
+ * plausible cause is React Strict Mode in dev OR Next.js
+ * hydration re-running the effect with a transiently-changed
+ * pathname identity.  The ref-based guard catches both: if the
+ * tracker has already fired for the current path, it skips.
+ * Navigation to a NEW path always fires (ref-stored value differs).
  */
 export function AnalyticsTracker() {
   const pathname = usePathname();
+  const lastFiredFor = useRef<string | null>(null);
 
   useEffect(() => {
+    // Skip if we've already fired for this exact pathname during
+    // this mount lifecycle.  Prevents double-fires from Strict Mode
+    // double-invocation, hydration-time re-renders, and any future
+    // Next.js quirk that re-runs the effect without an actual
+    // navigation.
+    if (lastFiredFor.current === pathname) {
+      return;
+    }
+    lastFiredFor.current = pathname;
+
     // Defer to next tick — gives Next.js a moment to settle the
     // route + meta tags before we capture the path.
     const timer = window.setTimeout(() => {
+      // Diagnostic console log — left in production deliberately.
+      // It's a single low-noise line that lets the founder verify
+      // tracking is firing for the expected path when debugging
+      // the analytics dashboard.  console.debug doesn't show by
+      // default in DevTools (need to enable "Verbose" filter), so
+      // it stays out of the way for ordinary users.
+      console.debug("[centproof:analytics] page_view fired for", pathname);
       trackEvent("page_view");
     }, 0);
     return () => window.clearTimeout(timer);
