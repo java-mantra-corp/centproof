@@ -66,21 +66,35 @@ export function trackEvent(
   // Prefer sendBeacon for fire-and-forget on navigation events
   // (the user might click Download and leave the page before
   // fetch resolves).  sendBeacon is queued by the browser even
-  // if the page is unloading.  Falls back to fetch on browsers
-  // without sendBeacon (very rare in 2026).
+  // if the page is unloading.
+  //
+  // Pass 5.0b: Blob type is "text/plain" instead of "application/json".
+  // Reason: sendBeacon CAN NOT issue CORS preflight requests.  Sending
+  // a Blob with a non-CORS-safelisted Content-Type (like
+  // application/json) triggers preflight requirements that sendBeacon
+  // can't satisfy, so the browser blocks the request entirely — DevTools
+  // shows "CORS error" on a "ping" type request.  text/plain IS
+  // CORS-safelisted (the spec calls these "CORS-safelisted request
+  // headers"), so the browser sends the request as a simple POST
+  // without preflight.  The server still parses the body as JSON;
+  // we just lie about the Content-Type header.  This is the same
+  // pattern Plausible, Fathom, and Google Analytics all use.
   try {
     if (navigator.sendBeacon) {
-      const blob = new Blob([body], { type: "application/json" });
-      navigator.sendBeacon(ENDPOINT, blob);
-      return;
+      const blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
+      const queued = navigator.sendBeacon(ENDPOINT, blob);
+      if (queued) return;
+      // sendBeacon returned false = queue full / browser refused.
+      // Fall through to fetch as a last resort.
     }
   } catch {
     /* fall through to fetch */
   }
-  // Cast to keep the fetch type-checker happy with the keepalive flag.
+  // Fallback path — full fetch with keepalive.  Same Content-Type
+  // change here for consistency; the server accepts either.
   void fetch(ENDPOINT, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "text/plain;charset=UTF-8" },
     body,
     keepalive: true,
     credentials: "omit",
