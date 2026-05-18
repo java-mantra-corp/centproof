@@ -20,11 +20,19 @@ const GADS_SEND_TO =
     ? `${GADS_TAG_ID}/${GADS_CONVERSION_LABEL}`
     : "";
 
-// Minimal window.gtag type declaration so we can call it without
-// pulling in @types/gtag.js as a dep.
+// Reddit Pixel conversion configuration — fires alongside the
+// Google Ads conversion event so paid Reddit traffic gets attributed
+// too.  Single env var (the pixel itself does the routing).  See
+// components/RedditPixel.tsx for the loader.
+const REDDIT_PIXEL_ENABLED =
+  (process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID ?? "").trim().length > 0;
+
+// Minimal window typings so we can call gtag / rdt without pulling
+// in @types/gtag.js or @types/reddit-pixel as deps.
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    rdt?: (...args: unknown[]) => void;
   }
 }
 
@@ -51,6 +59,34 @@ function fireGoogleAdsConversion(plan: string, value: number) {
     value,
     currency: "USD",
     transaction_id: `${plan}-${Date.now()}`,
+  });
+}
+
+/**
+ * Fire a Reddit Pixel Purchase event for a checkout-button click.
+ * Same shape as the Google Ads conversion: we track checkout INTENT
+ * (Buy button click), not actual completed purchase — the visitor
+ * leaves to LemonSqueezy after this so we can't observe completion.
+ * Reddit Ads attribution matches the click to the originating
+ * subreddit ad.
+ *
+ * No-ops when NEXT_PUBLIC_REDDIT_PIXEL_ID isn't set OR when rdt
+ * hasn't loaded yet (Reddit pixel script is on a global CDN; usually
+ * loads within 1-2 seconds after page first-paint).
+ *
+ * transactionId is shared with the Google Ads conversion's
+ * transaction_id so future deduplication (if we ever add server-side
+ * conversions API) can match them.
+ */
+function fireRedditPixelPurchase(plan: string, value: number) {
+  if (!REDDIT_PIXEL_ENABLED) return;
+  if (typeof window === "undefined") return;
+  if (typeof window.rdt !== "function") return;
+  window.rdt("track", "Purchase", {
+    currency: "USD",
+    itemCount: 1,
+    value,
+    transactionId: `${plan}-${Date.now()}`,
   });
 }
 
@@ -116,15 +152,16 @@ export function CheckoutLink({
       opp: opp ?? undefined,                // opportunity id if attributed
     });
 
-    // Fire Google Ads conversion event so Ads can attribute this
-    // checkout click to the originating keyword / ad / campaign.
-    // No-ops gracefully when env vars aren't configured (local dev
-    // + Preview deploys, or before the Google Ads Conversion Action
-    // is created).  $49 for Pro Lifetime, $5 for Pro Monthly —
+    // Fire conversion events to BOTH ad platforms so each can
+    // attribute this checkout click to the originating ad.  Each
+    // no-ops gracefully when its env vars aren't configured (local
+    // dev / Preview deploys, or before each platform's setup is
+    // complete).  $49 for Pro Lifetime, $5 for Pro Monthly —
     // tracked as conversion VALUE, not actual revenue (the visitor
     // hasn't bought yet, just initiated checkout).
     const conversionValue = dataPlan === "Pro Lifetime" ? 49 : 5;
     fireGoogleAdsConversion(dataPlan, conversionValue);
+    fireRedditPixelPurchase(dataPlan, conversionValue);
 
     if (!opp) return; // no tracking link — leave href as-is
 

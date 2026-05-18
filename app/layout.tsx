@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import { GoogleTag } from "@/components/GoogleTag";
+import { RedditPixel } from "@/components/RedditPixel";
 import "./globals.css";
 
 const SITE_URL =
@@ -89,6 +90,9 @@ export default function RootLayout({
             NEXT_PUBLIC_GOOGLE_TAG_ID is set on Vercel.  See the
             component's docstring for the privacy stance. */}
         <GoogleTag />
+        {/* Reddit Ads conversion tracking — same pattern as
+            GoogleTag, gated on NEXT_PUBLIC_REDDIT_PIXEL_ID. */}
+        <RedditPixel />
       </body>
     </html>
   );
