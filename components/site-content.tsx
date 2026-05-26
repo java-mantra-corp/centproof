@@ -99,6 +99,14 @@ export const personas = [
     title: "Solo workers stitching multiple clients, business and personal cards into one searchable history.",
     body: "Drop in statements from every account, tag once with Smart Tagging, and search across years of activity. No cloud sync, no per-seat pricing.",
     icon: "report" as const,
+    // Direct link to the long-form workflow guide — turns the
+    // abstract persona promise ("we support freelancers") into a
+    // concrete playbook the visitor can read, lowering the
+    // commitment to install for evaluation.
+    link: {
+      href: "/guides/tracking-freelancer-expenses-on-a-mac",
+      label: "Read the freelancer playbook",
+    },
   },
   {
     eyebrow: "The Mac Power User",

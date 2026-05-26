@@ -195,6 +195,7 @@ export default function Home() {
               title={persona.title}
               body={persona.body}
               icon={personaIcons[persona.icon]}
+              link={"link" in persona ? persona.link : undefined}
             />
           ))}
         </div>

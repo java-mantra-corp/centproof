@@ -23,6 +23,14 @@ export const metadata: Metadata = {
  */
 const guides = [
   {
+    slug: "tracking-freelancer-expenses-on-a-mac",
+    title:
+      "Tracking 1099 business expenses on your Mac, without the cloud",
+    description:
+      "The 30-minute setup, the 15-minute monthly workflow, and the 1-hour tax-time workflow for solo workers who want Schedule C-ready books without giving an app their bank password or paying per-seat SaaS pricing.",
+    readTime: "9 min read",
+  },
+  {
     slug: "pdf-statement-formats-by-bank",
     title: "PDF statement formats by bank — why every one looks different",
     description:

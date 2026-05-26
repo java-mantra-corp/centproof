@@ -79,11 +79,17 @@ export function PersonaCard({
   title,
   body,
   icon,
+  link,
 }: {
   eyebrow: string;
   title: string;
   body: string;
   icon?: React.ReactNode;
+  /** Optional "read the playbook →" link.  When a persona has a
+   *  dedicated long-form guide on /guides, set this to the route
+   *  + label so the card invites visitors into the concrete
+   *  workflow instead of leaving the persona claim abstract. */
+  link?: { href: string; label: string };
 }) {
   return (
     <article className="flex h-full flex-col rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition hover:border-[#0F766E]/40 hover:shadow-md">
@@ -97,6 +103,14 @@ export function PersonaCard({
         {title}
       </h3>
       <p className="mt-3 text-sm leading-6 text-[#475569]">{body}</p>
+      {link ? (
+        <a
+          href={link.href}
+          className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#0F766E] hover:underline"
+        >
+          {link.label} <span aria-hidden>→</span>
+        </a>
+      ) : null}
     </article>
   );
 }
