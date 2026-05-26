@@ -243,7 +243,7 @@ export default function Home() {
           <SectionIntro
             eyebrow="Supported banks"
             title="Built from real statement formats."
-            body="Current support covers major US banks and cards. More parsers are prioritized from redacted sample statements."
+            body="Current support covers major US banks and cards. New parsers are written from one redacted sample statement — if your bank is missing, you can move it to the top of the queue."
           />
           <Link
             href="/banks"
@@ -256,6 +256,18 @@ export default function Home() {
           {supportedBanks.map((bank) => (
             <BankBadge key={bank} name={bank} />
           ))}
+          {/* "Don't see your bank?" CTA — sits as the 10th tile in the
+              9-bank grid so it fills the trailing empty cell on the
+              5-column desktop layout and reads as a natural next step
+              instead of a separate section.  Distinct styling (teal
+              border + arrow) so it doesn't look like just another
+              supported bank. */}
+          <Link
+            href="/banks/submit"
+            className="group flex items-center justify-between gap-2 rounded-2xl border border-[#0F766E]/30 bg-[#F0FDFA] px-4 py-3 text-sm font-semibold text-[#0F766E] shadow-sm transition hover:border-[#0F766E] hover:bg-white"
+          >
+            <span>Don&apos;t see your bank? Send a sample →</span>
+          </Link>
         </div>
       </section>
 
