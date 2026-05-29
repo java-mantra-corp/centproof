@@ -19,6 +19,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/about", priority: 0.7, changeFrequency: "monthly" },
     { path: "/changelog", priority: 0.75, changeFrequency: "weekly" },
     { path: "/banks", priority: 0.7, changeFrequency: "weekly" },
+    // Docs section — how-to-use-the-app content (v0.1.7).  Higher
+    // priority than /guides because it's primary product reference.
+    { path: "/docs", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/docs/quick-start", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/importing-statements", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/reviewing-reconciling", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/tagging-entities-categories", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/ask-centproof", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/reports-and-exports", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/docs/backup-and-recovery", priority: 0.75, changeFrequency: "monthly" },
     { path: "/guides", priority: 0.65, changeFrequency: "monthly" },
     {
       // New guides go at this same priority — long-form content earns

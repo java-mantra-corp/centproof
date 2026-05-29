@@ -13,6 +13,10 @@ export const navItems = [
   ["Security", "/security"],
   ["Banks", "/banks"],
   ["Pricing", "/pricing"],
+  // Docs is product reference — placed before Guides (which is
+  // banking-concept content).  When a user clicks Help → Docs from
+  // the in-app menu, they land here.
+  ["Docs", "/docs"],
   ["Guides", "/guides"],
   ["About", "/about"],
   ["FAQ", "/faq"],
