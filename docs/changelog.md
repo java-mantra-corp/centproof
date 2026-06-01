@@ -85,6 +85,48 @@ version must start with `## <version>` on its own line.
 
 ### Fixed
 
+- **Every destructive action's confirm dialog was silently doing
+  nothing on macOS.** Click "Move to Trash" on a statement, click
+  Delete on a category or entity, click "Add Schedule C preset" —
+  all of these expected to show a yes/no confirmation but the
+  dialog never appeared, and (because the underlying gate
+  defaulted to "cancel") the action silently did nothing. The
+  root cause was a Tauri webview behavior on macOS that drops
+  browser confirm() calls without a dialog. CentProof now uses
+  Tauri's native confirmation plugin, which produces a real macOS
+  sheet with title, message, and labeled action buttons. **If you
+  hit this in v0.1.7 and concluded a feature was broken — try
+  again after updating.** The Schedule C preset, in particular,
+  was completely blocked.
+
+- **Backend error messages were not reaching the user.** When the
+  sidecar rejected an action (e.g., "can't delete a category that
+  still has transactions"), the catch handler tried to display
+  the message via the same dropped-dialog mechanism above, so the
+  user saw no feedback at all. CentProof now uses the same toast
+  notification system as Tax Summary and Settlement for delete /
+  restore / empty-trash feedback in Categories, Entities, and
+  Trash — success and error messages alike.
+
+- **Category and Entity delete sometimes refused on rows the UI
+  said were UNUSED.** If you tagged a transaction with a category
+  or entity and later trashed the statement that transaction
+  belonged to, the Categories / Entities lists correctly showed
+  the tag as UNUSED — but clicking Delete still failed with "1
+  transactions still reference it." The list count and the delete
+  check were using different filters: the list excluded
+  trashed-statement rows, the delete didn't. CentProof now uses
+  the same filter for both, and silently clears the dangling
+  pointer on the trashed-statement row inside the delete (audit
+  log records the count). The UI's UNUSED badge now reliably
+  means "safe to delete."
+
+- **Tax Summary "Save as PDF" producing no file in the desktop
+  app.** A first-pass implementation relied on the browser's
+  window.print() API, which Tauri's macOS webview silently drops.
+  Switched to the same jsPDF + native save-dialog path Settlement
+  Report already uses. Click now actually produces a file.
+
 - **Chase Business Complete Checking statements with no deposits
   that period.** v0.1.7's business-statement support relied on a
   "deposits and additions" section marker to recognize a Chase
@@ -95,13 +137,6 @@ version must start with `## <version>` on its own line.
   total. The detection now matches any of the five Chase business
   section markers, so quiet-month statements parse correctly and
   reconcile to the cent.
-
-- **Tax Summary "Save as PDF" producing no file in the desktop
-  app.** A first-pass implementation relied on the browser's
-  window.print() API, which Tauri's macOS webview silently drops
-  (same reason browser-style downloads don't work). Switched to
-  the same jsPDF + native save-dialog path Settlement Report
-  already uses. Click now actually produces a file.
 
 - **Settlement Report date inputs visually showed today's date
   but the report listed historical transactions.** The empty-input
@@ -124,7 +159,8 @@ version must start with `## <version>` on its own line.
   trashing is recoverable for 30 days. The new prompt names the
   specific statement (filename and period) and explains that
   it'll stay recoverable for 30 days via the Trash tab before
-  being purged permanently.
+  being purged permanently. Action buttons are now labeled
+  "Move to Trash" and "Keep" instead of generic OK / Cancel.
 
 ### Notes for existing users
 
@@ -142,6 +178,10 @@ version must start with `## <version>` on its own line.
   Open the new Reports → Tax Summary tab, pick a period, and
   compute — every reconciled statement you've already ingested
   contributes immediately.
+- **If destructive actions seemed broken on v0.1.7 — they were.**
+  See the confirm-dialog fix in Fixed above. Re-try anything you
+  had given up on (deleting a category, trashing a statement,
+  adding the Schedule C preset).
 
 ---
 
