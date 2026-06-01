@@ -258,6 +258,15 @@ export const productSections = [
     body: "Compare imported periods and see which merchants or categories drove the difference. Summaries are useful because they stay tied to source rows.",
   },
   {
+    title: "Tax Summary",
+    // No dedicated screenshot yet — reuse the reports image; the tax
+    // summary lives under the same Reports section in the app.  TODO:
+    // capture a real screenshot once the in-app feature is stable.
+    imageTitle: "Tax Summary — income, outgoing, and net for a date range",
+    imagePath: "/images/product/reports.png",
+    body: "Pick a date range (Tax year, Year-to-date, Last 3 months, Last 90, Last 30, or custom) and CentProof sums every credit and debit across one account or all of them. The outgoing breakdown groups by kind so credit-card payments and account transfers stay visually separate from real expenses. Save as a one-page PDF for your CPA, or pick the Detailed PDF to include every transaction listed with a cropped snapshot of its source bank-statement row in an appendix.",
+  },
+  {
     title: "Price Watch",
     imageTitle: "Price Watch — CentProof screenshot",
     imagePath: "/images/product/priceWatch.png",
@@ -267,7 +276,7 @@ export const productSections = [
     title: "Reports and Exports",
     imageTitle: "Reports and Exports — CentProof screenshot",
     imagePath: "/images/product/reports.png",
-    body: "Create trip reports, settlement reports, search exports, and PDF previews from reconciled data. Exports are built around source-linked transactions.",
+    body: "Trip reports, settlement reports, the Tax Summary, search exports, and PDF previews — all built from reconciled, source-linked data. Settlement and Tax Summary both export a clean one-page PDF or a detailed PDF that includes a cropped snapshot of every transaction's source bank-statement row, so anyone reading the report can verify the numbers without opening the original PDFs. Off-statement cash flows (contractor cash payments, owner draws, tax-year adjustments) can be added as manual entries that show up clearly tagged as user-recorded throughout.",
   },
   {
     title: "Local Backup",
@@ -403,6 +412,7 @@ export const pricingPlans = [
       "Unlimited Ask CentProof questions",
       "Full local AI features",
       "CSV / OFX / QFX / JSON / PDF exports",
+      "Tax Summary with manual entries + Detailed PDF (source-PDF snapshots)",
       "Up to 2 Macs",
       "One year of updates and support",
       "Major upgrades may be optional paid upgrades later",
@@ -421,6 +431,7 @@ export const pricingPlans = [
       "Unlimited Ask CentProof questions",
       "Full local AI features",
       "All export formats",
+      "Tax Summary with manual entries + Detailed PDF (source-PDF snapshots)",
       "Updates and support while subscribed",
       "1 Mac",
       "Cancel anytime",

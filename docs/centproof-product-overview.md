@@ -194,16 +194,32 @@ Every imported statement is reconciled against its own opening/closing balance. 
 
 Your data lives in a single local folder. You can back it up with Time Machine, copy it to an external drive, or export everything to CSV/JSON for use elsewhere. There's no vendor lock-in by design.
 
-### 5.13 Tax / Export Workspace — *Coming soon (Pro tier)*
+### 5.13 Tax Summary — *Available now*
 
-A dedicated workspace for tax season:
-- Generate Schedule C-ready reports for freelancers and small business
-- Mark transactions as deductible/non-deductible
-- Export to TurboTax, H&R Block, FreshBooks formats
-- Annual summary report with category breakdowns
-- Mileage tracker (manual, not surveillance-based)
+A one-screen view built for the "hand-it-to-my-CPA" moment.
 
-### 5.14 Receipt Attachments — *Coming soon*
+- Pick a date range (Tax year, Year-to-date, Last 3 months, Last 90, Last 30, or custom)
+- Pick one account or all accounts
+- Compute → Income, Outgoing, and Net for that period, with the outgoing total broken down by transaction kind (credit-card payments, transfers, ATM, fees, purchases) so it's obvious which lines are real expenses vs inter-account movement
+- Save as PDF — clean one-page CPA handoff with a "For your CPA" note explaining that card payments and transfers are not deductible expenses on their own (the underlying card-statement line items are)
+- Save as Detailed PDF — adds a transactions list page and an appendix with a cropped snapshot of every transaction's row from its source bank statement, so the CPA can spot-check every number without opening the source PDFs
+
+### 5.14 Manual Entries on Tax Summary — *Available now*
+
+Capture off-statement cash flows your CPA needs.
+
+- Cash payments to contractors not on any statement
+- Owner draws / capital contributions paid in cash
+- In-kind income (barter, trade)
+- Year-end tax adjustments and carry-overs
+
+Manual entries merge into the headline Income / Outgoing / Net totals and appear in a dedicated amber "Manual entries" section both on screen and in the PDF, always tagged with a MANUAL badge so the CPA can tell at a glance what's bank-verified vs user-claimed.
+
+### 5.15 Schedule C Preset on Categories — *Available now*
+
+One click adds the 16 standard IRS Schedule C expense categories — Advertising, Bank & Card Fees, Contractor Labor, Insurance, Office Expenses, Rent & Lease, Software & Subscriptions, Travel, Vehicle / Mileage, and the rest. Idempotent — categories you've already created are reused, not duplicated. Useful for fresh-install 1099 freelancers who want the standard taxonomy ready to go.
+
+### 5.16 Receipt Attachments — *Coming soon*
 
 Attach a photo or PDF of a receipt to any transaction. Useful for:
 - Expense reimbursements
@@ -212,7 +228,7 @@ Attach a photo or PDF of a receipt to any transaction. Useful for:
 
 Stored locally. Searchable by transaction.
 
-### 5.15 Auto-Update — *Coming soon*
+### 5.17 Auto-Update — *Coming soon*
 
 Code-signed, notarized macOS app with automatic updates over an encrypted channel. You stay current; we never push anything else.
 
@@ -236,7 +252,7 @@ Five concrete personas. Use these as homepage testimonial-style sections or as "
 
 **The pain:** Tax time is a multi-day forensic exercise. QuickBooks Self-Employed wants $20/month forever. Mint is dead. You end up in spreadsheets.
 
-**Why CentProof:** One place to drop every PDF, every card, every account. Smart categorization that learns. Coming Pro tier with Schedule C-ready exports.
+**Why CentProof:** One place to drop every PDF, every card, every account. Smart categorization that learns. Tax Summary view sums income and outgoing for any date range and exports a CPA-ready PDF — with optional source-PDF snapshots so the CPA can verify every line against the original bank statement. One-click Schedule C preset adds the 16 standard IRS expense categories. Manual entries capture off-statement cash flows the bank can't see.
 
 ### 6.3 The Mac Power User
 
