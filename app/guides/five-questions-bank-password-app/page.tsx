@@ -199,7 +199,7 @@ export default function GuideFiveQuestions() {
               <strong className="font-semibold text-[#0F172A]">
                 Can you export everything?
               </strong>{" "}
-              Look for a real export — CSV, OFX, QFX, JSON — not just
+              Look for a real export — CSV, PDF — not just
               a printable summary report. The export should include
               every transaction, your categorisation work, and any
               notes you&apos;ve added.

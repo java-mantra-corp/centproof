@@ -5,7 +5,7 @@ import { PageShell } from "@/components/page-shell";
 export const metadata: Metadata = {
   title: "Reports and exports",
   description:
-    "How to use saved reports, trip reports, settlement reports, and which export format (CSV, OFX, QFX, JSON, PDF) to use for which downstream tool — accountant, tax software, spreadsheet, or audit.",
+    "How to use saved reports, trip reports, settlement reports, and which export format (CSV, PDF) to use for which downstream tool — accountant, tax software, spreadsheet, or audit.",
   alternates: { canonical: "/docs/reports-and-exports" },
   openGraph: {
     title: "CentProof — Reports and exports",
@@ -42,9 +42,9 @@ export default function DocReports() {
           search filter once, save it as a Saved Report, and re-run
           it any time. Or pick a more specialized report type — Trip
           Report (per-trip P&amp;L), Settlement Report (per-client /
-          per-entity P&amp;L). Export to CSV for spreadsheets, OFX /
-          QFX for Quicken-style accounting tools, JSON for engineers,
-          PDF for accountants or audit trails. Export formats are
+          per-entity P&amp;L). Export to CSV for spreadsheets and
+          accounting tools, or PDF for accountants or audit trails.
+          Export formats are
           available on Pro; Free Test Mode exports are watermarked
           and capped at 50 rows.
         </aside>
@@ -166,7 +166,7 @@ export default function DocReports() {
             Which export format to use
           </h2>
           <p>
-            CentProof supports five export formats. Picking the right
+            CentProof supports two export formats. Picking the right
             one depends on where the data is going.
           </p>
           <ul className="list-disc space-y-3 pl-6">
@@ -177,26 +177,6 @@ export default function DocReports() {
               accountants prefer CSV), for ad-hoc spreadsheet
               analysis, or as a backup format. One column per field,
               one row per transaction.
-            </li>
-            <li>
-              <strong>OFX</strong> — &quot;Open Financial Exchange.&quot;
-              Industry-standard format used by most personal-finance
-              and accounting software (Quicken, GnuCash, Banktivity,
-              Moneydance, etc.). Use this if you&apos;re importing
-              from CentProof into another finance app.
-            </li>
-            <li>
-              <strong>QFX</strong> — Quicken&apos;s flavor of OFX,
-              with a few extra fields Quicken expects. Use this for
-              Quicken specifically. Other apps accept it too but
-              treat it as OFX.
-            </li>
-            <li>
-              <strong>JSON</strong> — structured machine-readable
-              export. Useful if you&apos;re writing a script against
-              your data (Python, Node, whatever) or feeding into a
-              custom dashboard. One JSON object per transaction with
-              every field.
             </li>
             <li>
               <strong>PDF</strong> — a printable / shareable report
@@ -240,7 +220,7 @@ export default function DocReports() {
             </li>
             <li>
               Export to CSV per category and hand to your accountant
-              — or import the OFX into TurboTax Self-Employed.
+              — or hand the CSV to your tax preparer.
             </li>
             <li>
               Sanity-check with Anomaly Detection before submitting.

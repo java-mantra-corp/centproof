@@ -67,7 +67,7 @@ export const workflowSteps = [
   ["Verify reconciliation", "CentProof checks statement math down to the cent."],
   ["Search, tag, and organize", "Clean up merchants, entities, categories, and notes."],
   ["Ask CentProof questions", "Run local AI queries with source rows shown underneath."],
-  ["Export reports", "Create CSV, JSON, OFX, QFX, and PDF reports from local data."],
+  ["Export reports", "Create CSV and PDF reports from local data."],
 ];
 
 /**
@@ -181,7 +181,7 @@ export const homepageFeatures = [
   },
   {
     title: "Standard exports. Zero lock-in.",
-    body: "Trip reports, settlement reports, search exports — plus universal CSV, OFX, QFX, JSON, and PDF outputs. Your data lives in a local SQLite database. If CentProof goes away tomorrow, your history is yours forever.",
+    body: "Trip reports, settlement reports, search exports — plus CSV and PDF outputs. Your data lives in a local SQLite database. If CentProof goes away tomorrow, your history is yours forever.",
     icon: <VaultIcon />,
   },
 ];
@@ -389,7 +389,7 @@ export const pricingPlans = [
       "5 lifetime imports",
       "5 Ask CentProof questions, then 1/day",
       "Full search on imported data",
-      "Watermarked CSV/JSON export, first 50 rows",
+      "Watermarked CSV export, first 50 rows",
       "PDF report preview with watermark",
       "1 saved report",
     ],
@@ -411,7 +411,7 @@ export const pricingPlans = [
       "Unlimited statements, accounts, and transactions",
       "Unlimited Ask CentProof questions",
       "Full local AI features",
-      "CSV / OFX / QFX / JSON / PDF exports",
+      "CSV and PDF exports",
       "Tax Summary with manual entries + Detailed PDF (source-PDF snapshots)",
       "Up to 2 Macs",
       "One year of updates and support",
@@ -530,7 +530,7 @@ export const faqs = [
   },
   {
     question: "Can I export my data?",
-    answer: "Yes. CentProof supports exports such as CSV, OFX, QFX, JSON, and PDF reports depending on your plan.",
+    answer: "Yes. CentProof supports CSV and PDF exports depending on your plan.",
   },
   {
     question: "Does CentProof give tax advice?",

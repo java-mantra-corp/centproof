@@ -450,10 +450,11 @@ Vehicle / Mileage      (if not using mileage method)`}
             </li>
             <li>
               <strong>Direct QuickBooks / Xero sync.</strong>{" "}
-              CentProof exports to CSV, OFX, QFX, JSON, and PDF. If
-              your accountant insists on QuickBooks Online,
-              CentProof can be your privacy-preserving working copy
-              and you sync to QBO at year end.
+              CentProof exports to CSV and PDF; it doesn&apos;t sync
+              to QuickBooks or Xero. If your accountant uses
+              QuickBooks Online or Xero, CentProof can be your
+              privacy-preserving working copy and you hand them the
+              CSV.
             </li>
             <li>
               <strong>Double-entry general-ledger

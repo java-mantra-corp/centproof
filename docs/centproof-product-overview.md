@@ -110,7 +110,7 @@ The main workspace. Filter by:
 - Direction (debit/credit)
 - Free-text search
 
-Inline editing for category, merchant tag, and notes. Bulk actions for multi-select. Export to CSV, OFX, QFX (for tax software), or plain JSON.
+Inline editing for category, merchant tag, and notes. Bulk actions for multi-select. Export to CSV or PDF.
 
 ### 5.3 Smart Tagging (Entities + Categories) — *Available now*
 
@@ -192,7 +192,7 @@ Every imported statement is reconciled against its own opening/closing balance. 
 
 ### 5.12 Local Backup & Export — *Available now*
 
-Your data lives in a single local folder. You can back it up with Time Machine, copy it to an external drive, or export everything to CSV/JSON for use elsewhere. There's no vendor lock-in by design.
+Your data lives in a single local folder. You can back it up with Time Machine, copy it to an external drive, or export everything to CSV or PDF for use elsewhere. There's no vendor lock-in by design.
 
 ### 5.13 Tax Summary — *Available now*
 
@@ -372,7 +372,7 @@ There's a "Share a sample" button in the app. Send us a redacted PDF and we add 
 
 ### 10.5 What happens if CentProof goes out of business?
 
-Your data is on your Mac, in standard formats. You can export everything to CSV, OFX, or JSON at any time. Even if we vanish, you keep your history. There's no cloud account to lose access to.
+Your data is on your Mac, in standard formats. You can export everything to CSV or PDF at any time. Even if we vanish, you keep your history. There's no cloud account to lose access to.
 
 ### 10.6 What does it cost?
 
@@ -489,7 +489,7 @@ Three short reassurance blurbs to put near the CTA. People shopping for finance 
 
 > **Try it without paying.** Download the app, import a sample statement we provide, and see exactly how it works before you spend a dollar.
 
-> **Your data is yours forever.** Export to CSV, OFX, or JSON anytime. There's no vendor lock-in because there's no vendor cloud.
+> **Your data is yours forever.** Export to CSV or PDF anytime. There's no vendor lock-in because there's no vendor cloud.
 
 > **Pay once, own it.** No subscription. No recurring fee. Buy CentProof once and own this version forever, including bug fixes and small updates. Major upgrades (like the future Pro tier) are optional, one-time, and clearly separate.
 

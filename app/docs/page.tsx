@@ -69,7 +69,7 @@ const docs = [
     slug: "reports-and-exports",
     title: "Reports and exports",
     description:
-      "Saved reports, trip reports, settlement reports, and which export format (CSV, OFX, QFX, JSON, PDF) to use for which downstream tool.",
+      "Saved reports, trip reports, settlement reports, and which export format (CSV, PDF) to use for which downstream tool.",
     readTime: "5 min read",
   },
   {
