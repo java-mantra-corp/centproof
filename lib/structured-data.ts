@@ -63,6 +63,48 @@ export function softwareApplicationSchema() {
   };
 }
 
+/**
+ * SoftwareApplication + two Offers for the Business edition, used on
+ * the /business landing page.  Separate builder (not merged into
+ * softwareApplicationSchema) so each page's JSON-LD mirrors exactly
+ * the prices that page shows — Google penalizes markup describing
+ * offers not visible on the page.
+ */
+export function businessApplicationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "CentProof Business",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "macOS 13 Ventura or later (Apple Silicon)",
+    url: `${SITE_URL}/business`,
+    description:
+      "Local-first Mac app for bookkeepers and accountants. Import client bank and credit-card PDF statements, reconcile to the cent, manage a fully isolated workspace per client, batch-import folders, and export to CSV, OFX, and QuickBooks (QBO/QFX). No bank password, no cloud sync.",
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Business Lifetime",
+        price: "299",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/business`,
+        description:
+          "One-time purchase covering unlimited clients on up to 2 Macs. Includes 12 months of feature updates and support; the app keeps working permanently after that.",
+      },
+      {
+        "@type": "Offer",
+        name: "Business Monthly",
+        price: "29",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/business`,
+        description:
+          "Monthly subscription with full Business features for unlimited clients on 1 Mac. Starts with a 14-day free trial. Cancel anytime.",
+      },
+    ],
+  };
+}
+
 interface QA {
   question: string;
   answer: string;

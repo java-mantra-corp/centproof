@@ -201,6 +201,32 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-y border-[#E2E8F0] bg-[#F0FDFA]">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-[#0F766E]">
+                For bookkeepers &amp; accountants
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">
+                Keep books for clients? Meet CentProof Business.
+              </h2>
+              <p className="mt-4 text-base leading-7 text-[#475569]">
+                A fully isolated workspace per client, batch import for whole
+                folders of statements, and exports to CSV, OFX, and QuickBooks —
+                all local, with unlimited clients and no per-seat fees.
+              </p>
+            </div>
+            <Link
+              href="/business"
+              className="inline-flex h-12 w-fit shrink-0 items-center justify-center rounded-lg bg-[#0F766E] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#115E59]"
+            >
+              Explore Business →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-[#E2E8F0] bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
           <SectionIntro
