@@ -74,7 +74,7 @@ export default function BusinessPage() {
               Download for Mac
             </Link>
             <Link
-              href="/pricing"
+              href="/pricing#business"
               className="inline-flex h-12 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white px-5 text-sm font-semibold text-[#0F172A] shadow-sm transition hover:border-[#0F766E] hover:text-[#0F766E]"
             >
               See Business pricing

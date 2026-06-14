@@ -68,6 +68,11 @@ export default function PricingPage() {
             when you want unlimited imports, exports, and local AI — and pay
             once instead of monthly.
           </p>
+          <p className="mt-4 text-sm font-semibold">
+            <a href="#business" className="text-[#0F766E] hover:underline">
+              Keep books for clients? See CentProof Business pricing →
+            </a>
+          </p>
         </div>
 
         <div className="mt-10 rounded-2xl border border-[#0F766E]/20 bg-[#ECFDF5] px-5 py-4 text-sm font-semibold text-[#0F766E]">
@@ -125,7 +130,10 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="border-t border-[#E2E8F0] bg-[#F8FAFC]">
+      <section
+        id="business"
+        className="scroll-mt-24 border-t border-[#E2E8F0] bg-[#F8FAFC]"
+      >
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionIntro
