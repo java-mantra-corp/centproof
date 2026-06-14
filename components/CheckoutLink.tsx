@@ -156,10 +156,19 @@ export function CheckoutLink({
     // attribute this checkout click to the originating ad.  Each
     // no-ops gracefully when its env vars aren't configured (local
     // dev / Preview deploys, or before each platform's setup is
-    // complete).  $49 for Pro Lifetime, $5 for Pro Monthly —
-    // tracked as conversion VALUE, not actual revenue (the visitor
-    // hasn't bought yet, just initiated checkout).
-    const conversionValue = dataPlan === "Pro Lifetime" ? 49 : 5;
+    // complete).  The VALUE reported is each plan's price, so value-
+    // based bidding optimizes toward the most valuable conversions
+    // (Business ≫ Pro) instead of treating every checkout as equal.
+    // It's a conversion VALUE signal, not actual revenue — the visitor
+    // hasn't bought yet, just initiated checkout.  Unknown/new plans
+    // fall back to $5 so a plan we forget to add never reports $0.
+    const CONVERSION_VALUE: Record<string, number> = {
+      "Business Lifetime": 299,
+      "Business Monthly": 29,
+      "Pro Lifetime": 49,
+      "Pro Monthly": 5,
+    };
+    const conversionValue = CONVERSION_VALUE[dataPlan] ?? 5;
     fireGoogleAdsConversion(dataPlan, conversionValue);
     fireRedditPixelPurchase(dataPlan, conversionValue);
 
