@@ -9,6 +9,10 @@ import {
 
 export const navItems = [
   ["Product", "/product"],
+  // Business-edition landing page — placed right after Product so the
+  // bookkeeper/accountant audience can self-select immediately instead
+  // of inferring it from the Pricing page.
+  ["For Business", "/business"],
   ["Privacy", "/privacy"],
   ["Security", "/security"],
   ["Banks", "/banks"],
@@ -377,6 +381,27 @@ const lifetimeUrl =
     ? `${lifetimeBase}${lifetimeBase.includes("?") ? "&" : "?"}checkout[discount_code]=${encodeURIComponent(launchCoupon)}`
     : lifetimeBase;
 
+/**
+ * Business-edition checkout URLs.  Same env-var pattern as the Pro
+ * URLs above: paste each LemonSqueezy variant's public checkout URL
+ * into these vars (Vercel for prod, .env.local for dev).  Unset →
+ * /support fallback, so a missing config never 404s a buyer.
+ *
+ *   NEXT_PUBLIC_LEMONSQUEEZY_BUSINESS_LIFETIME_URL  ($299 one-time)
+ *   NEXT_PUBLIC_LEMONSQUEEZY_BUSINESS_MONTHLY_URL   ($29/mo, 14-day trial)
+ *
+ * The 14-day free trial lives on the LemonSqueezy product itself, so
+ * no URL parameter is needed here — the trial just applies at checkout.
+ */
+const businessLifetimeUrl = presentOrFallback(
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_BUSINESS_LIFETIME_URL,
+  SUPPORT_FALLBACK,
+);
+const businessMonthlyUrl = presentOrFallback(
+  process.env.NEXT_PUBLIC_LEMONSQUEEZY_BUSINESS_MONTHLY_URL,
+  SUPPORT_FALLBACK,
+);
+
 export const pricingPlans = [
   {
     name: "Free Test Mode",
@@ -440,6 +465,135 @@ export const pricingPlans = [
   },
 ];
 
+/**
+ * Business-edition plans (v0.2.0).  Shown in their own section on
+ * /pricing and on the /business landing page.  Business is a SUPERSET
+ * of Pro — everything Pro does, plus multi-client workspaces and batch
+ * import — so the bullets lead with "Everything in Pro" and then name
+ * the two things only Business adds (isolated client workspaces +
+ * folder batch import).  Exports (CSV/OFX/QuickBooks) are a Pro-level
+ * feature too, listed here because they matter most to bookkeepers.
+ */
+export const businessPlans = [
+  {
+    name: "Business Lifetime",
+    price: "$299 one-time",
+    subtitle: "Own it. One payment for your whole practice.",
+    cta: "Buy Business Lifetime",
+    ctaUrl: businessLifetimeUrl,
+    ctaExternal: businessLifetimeUrl !== SUPPORT_FALLBACK,
+    badge: "Best value",
+    featured: true,
+    bullets: [
+      "Everything in Pro, for unlimited clients",
+      "A separate, fully isolated workspace per client",
+      "Batch import — drop a whole folder, auto-reconciled to the cent",
+      "CSV, OFX, and QuickBooks (QBO/QFX) exports",
+      "Tax Summary with manual entries + Detailed PDF (source-PDF snapshots)",
+      "Up to 2 Macs",
+      "One year of updates and support",
+      "Then optional $10–20/yr to keep updating — never a forced subscription",
+    ],
+    note: "Best for established bookkeepers and accountants who prefer owning their tools.",
+  },
+  {
+    name: "Business Monthly",
+    price: "$29/month",
+    subtitle: "Full Business access. Starts with a free trial.",
+    cta: "Start 14-day free trial",
+    ctaUrl: businessMonthlyUrl,
+    ctaExternal: businessMonthlyUrl !== SUPPORT_FALLBACK,
+    launchPriceNote: "14-day free trial, then $29/month",
+    bullets: [
+      "Everything in Pro, for unlimited clients",
+      "A separate, fully isolated workspace per client",
+      "Batch import — drop a whole folder, auto-reconciled to the cent",
+      "CSV, OFX, and QuickBooks (QBO/QFX) exports",
+      "Tax Summary with manual entries + Detailed PDF (source-PDF snapshots)",
+      "Updates and support while subscribed",
+      "1 Mac",
+      "Cancel anytime",
+    ],
+    note: "Great for trying Business risk-free, or for seasonal and growing practices.",
+  },
+];
+
+/**
+ * The four things that distinguish the Business edition.  Used as the
+ * pillar row at the top of /business.  Kept to plain data (no JSX) so
+ * the page can render them in a simple grid.
+ */
+export const businessPillars = [
+  {
+    title: "A workspace per client",
+    body: "Each client gets isolated accounts, statements, tags, and reports. Switch clients and you see only their data — never a mix.",
+  },
+  {
+    title: "Batch import a whole folder",
+    body: "Drop a client's entire stack of PDFs at once. CentProof reconciles each to the cent and files the clean ones automatically.",
+  },
+  {
+    title: "Export to QuickBooks",
+    body: "Send reconciled transactions to CSV, OFX, or QuickBooks QBO/QFX — ready to bring straight into your accounting workflow.",
+  },
+  {
+    title: "Private by design",
+    body: "Every client's data stays on your Mac. No cloud sync, no bank passwords, no client data leaving your machine.",
+  },
+];
+
+/**
+ * How a bookkeeper actually uses the Business edition end-to-end.
+ * Mirrors the personal `workflowSteps` shape ([title, body]) so the
+ * /business page can reuse the same numbered-step layout.
+ */
+export const businessWorkflow = [
+  ["Add a client", "Create an isolated workspace for each client you keep books for."],
+  ["Batch import statements", "Drag in a whole folder of a client's PDFs; CentProof reconciles each to the cent."],
+  ["Review only what needs it", "Clean statements file themselves. Anything that doesn't reconcile is queued for review."],
+  ["Tag and categorize once", "Smart Tagging learns each client's merchants and applies across their history."],
+  ["Export to your books", "Send the client's reconciled data to CSV, OFX, or QuickBooks QBO/QFX."],
+  ["Switch clients, repeat", "Each client's data stays fully separate. Pick the next client and go."],
+];
+
+/**
+ * Business-edition feature grid for /business.  Same `{title, body,
+ * icon}` shape as `homepageFeatures`, so it renders through the
+ * existing FeatureCard component.
+ */
+export const businessFeatures = [
+  {
+    title: "Isolated client workspaces",
+    body: "Every client is a separate workspace — accounts, statements, transactions, tags, categories, and reports never cross between clients. There's no combined all-clients view by design, so one client's numbers can't leak into another's.",
+    icon: <VaultIcon />,
+  },
+  {
+    title: "Batch import, auto-reconciled",
+    body: "Drop a whole folder of a client's statements. CentProof imports each, reconciles it against its own opening and closing balance, auto-files the ones that balance to the cent, and queues anything that doesn't for a quick review.",
+    icon: <FileTextIcon />,
+  },
+  {
+    title: "QuickBooks, OFX & CSV exports",
+    body: "Export a client's reconciled transactions to CSV, OFX, or QuickBooks-compatible QBO/QFX (Web Connect) files — so statement data flows straight into the books instead of being re-keyed by hand.",
+    icon: <ReportIcon />,
+  },
+  {
+    title: "Smart Tagging per client",
+    body: "Raw descriptions like 'AMZN MKTP US*4F8H2' become 'Amazon'. Tags are learned and applied per client, so each client's merchant vocabulary stays their own and improves every month.",
+    icon: <TagIcon />,
+  },
+  {
+    title: "Local AI, never the cloud",
+    body: "Ask plain-English questions about a client's spending and get answers with source rows. The 3-billion-parameter model runs natively on your Mac — no client financial data is ever sent to OpenAI, Anthropic, or anyone else.",
+    icon: <SparkIcon />,
+  },
+  {
+    title: "Reconciled to the cent",
+    body: "Every imported statement is checked against its own balances before you trust it. When a client asks how you know the numbers are right, you can show the reconciliation and the source bank-statement row behind each line.",
+    icon: <BalanceIcon />,
+  },
+];
+
 export const pricingFaqs = [
   {
     question: "What happens when I hit the Free Test Mode limits?",
@@ -480,6 +634,43 @@ export const pricingFaqs = [
   {
     question: "Will Pro Lifetime stop getting updates after one year?",
     answer: "Your purchased version keeps working forever, and bug-fix updates we choose to ship will still install. The 'one year of updates and support' covers new feature work and direct support replies. After year one, major new feature releases may be offered as optional paid upgrades — but you are never forced to pay again to keep using what you bought.",
+  },
+];
+
+/**
+ * Business-edition FAQ.  Shown on /business and surfaced in that page's
+ * FAQPage JSON-LD.  Answers the questions a bookkeeper asks before
+ * buying: how it differs from Pro, client isolation, the free trial,
+ * the $299 one-time terms, QuickBooks export, and privacy.
+ */
+export const businessFaqs = [
+  {
+    question: "What makes the Business edition different from Pro?",
+    answer: "Business adds multi-client support on top of everything Pro does. Every client gets its own fully isolated workspace — separate accounts, statements, transactions, tags, and reports — and you can batch-import a whole folder of a client's statements at once, with the ones that reconcile to the cent filed automatically.",
+  },
+  {
+    question: "Is each client's data kept separate?",
+    answer: "Yes. CentProof scopes every view, search, report, and AI answer to the client you have selected. Switch clients and you see only that client's data. There is no combined all-clients view, by design, so you never mix one client's numbers into another's.",
+  },
+  {
+    question: "Do you offer a free trial?",
+    answer: "Yes. Business Monthly starts with a 14-day free trial so you can run your real client workflow before paying. You can also try the core PDF-to-data engine for free in Free Test Mode on any download.",
+  },
+  {
+    question: "What does the $299 one-time include?",
+    answer: "Permanent use of the Business version you buy, plus one year of feature updates and support. After that first year your app keeps working forever; continuing to receive new updates is an optional $10–20/year — never a forced subscription.",
+  },
+  {
+    question: "Can I export to QuickBooks?",
+    answer: "Yes. CentProof exports reconciled transactions to CSV, OFX, and QuickBooks-compatible QBO/QFX (Web Connect) files, so a client's statement data flows straight into your accounting workflow instead of being re-keyed by hand.",
+  },
+  {
+    question: "How many clients can I manage?",
+    answer: "Unlimited. There is no per-client or per-seat fee — one Business license covers your whole client roster on your Mac.",
+  },
+  {
+    question: "Does my client data stay private?",
+    answer: "Yes — the same local-first guarantee as the personal edition. Every client's statements, database, and AI questions stay on your Mac. No cloud sync, no bank passwords, and no client data sent to anyone.",
   },
 ];
 

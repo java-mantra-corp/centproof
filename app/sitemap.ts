@@ -15,6 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1.0, changeFrequency: "monthly" },
     { path: "/pricing", priority: 0.95, changeFrequency: "monthly" },
     { path: "/download", priority: 0.9, changeFrequency: "weekly" },
+    // Business-edition landing page (v0.2.0) — high priority because it
+    // targets the bookkeeper/accountant buyer and is a primary purchase
+    // entry point, on par with /product.
+    { path: "/business", priority: 0.85, changeFrequency: "monthly" },
     { path: "/product", priority: 0.85, changeFrequency: "monthly" },
     { path: "/about", priority: 0.7, changeFrequency: "monthly" },
     { path: "/changelog", priority: 0.75, changeFrequency: "weekly" },

@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FAQItem, PricingCard, SectionIntro } from "@/components/cards";
 import { PageShell } from "@/components/page-shell";
-import { pricingFaqs, pricingPlans } from "@/components/site-content";
 import {
+  businessPlans,
+  pricingFaqs,
+  pricingPlans,
+} from "@/components/site-content";
+import {
+  businessApplicationSchema,
   faqPageSchema,
   softwareApplicationSchema,
 } from "@/lib/structured-data";
@@ -11,12 +16,12 @@ import {
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Free Test Mode, Pro Lifetime $49 one-time, or Pro Monthly $5/mo. Launch lifetime $29 for the first 30 days. Direct purchase via LemonSqueezy.",
+    "Free Test Mode, Pro from $5/mo or $49 one-time, and CentProof Business for bookkeepers from $29/mo or $299 one-time. Direct purchase via LemonSqueezy.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "CentProof Pricing",
     description:
-      "Try free with your own statements. Pay once for Pro Lifetime, or subscribe monthly. 30-day refund policy.",
+      "Try free with your own statements. CentProof for individuals, or CentProof Business for bookkeepers and accountants. 30-day refund policy.",
     url: "/pricing",
     type: "website",
   },
@@ -38,6 +43,12 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(softwareApplicationSchema()),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(businessApplicationSchema()),
         }}
       />
       <script
@@ -65,7 +76,10 @@ export default function PricingPage() {
           Then $49 one-time.
         </div>
 
-        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+        <p className="mt-10 text-sm font-semibold text-[#0F766E]">
+          For individuals &amp; households
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {pricingPlans.map((plan) => (
             <PricingCard key={plan.name} {...plan} />
           ))}
@@ -108,6 +122,29 @@ export default function PricingPage() {
               Up to 2 Macs on Pro Lifetime. Existing imports stay readable even if you never upgrade.
             </p>
           </Link>
+        </div>
+      </section>
+
+      <section className="border-t border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <SectionIntro
+              eyebrow="For bookkeepers & accountants"
+              title="CentProof Business — one workspace per client."
+              body="Everything in Pro, plus a fully isolated workspace for every client, batch import for whole folders of statements, and exports to CSV, OFX, and QuickBooks. Unlimited clients, one flat price — no per-seat fees."
+            />
+            <Link
+              href="/business"
+              className="inline-flex h-11 w-fit items-center justify-center rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-semibold text-[#0F172A] shadow-sm hover:border-[#0F766E] hover:text-[#0F766E]"
+            >
+              Explore Business →
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
+            {businessPlans.map((plan) => (
+              <PricingCard key={plan.name} {...plan} />
+            ))}
+          </div>
         </div>
       </section>
 
