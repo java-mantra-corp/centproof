@@ -35,6 +35,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/docs/backup-and-recovery", priority: 0.75, changeFrequency: "monthly" },
     { path: "/guides", priority: 0.65, changeFrequency: "monthly" },
     {
+      path: "/guides/getting-better-answers-from-ask-centproof",
+      priority: 0.65,
+      changeFrequency: "monthly",
+    },
+    {
       // New guides go at this same priority — long-form content earns
       // its position over time via inbound links, not by sitemap weight.
       path: "/guides/tracking-freelancer-expenses-on-a-mac",

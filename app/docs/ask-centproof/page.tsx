@@ -168,11 +168,68 @@ export default function DocAsk() {
           <p>
             The model is a 3B parameter model — small by modern
             standards. It works well for queries with a clear filter
-            + aggregation but can stumble on multi-step reasoning
-            (e.g. &quot;compare my Q3 spending to Q2 and tell me
-            why&quot;). For complex analysis, the answer might be
-            partial — but you still get the source rows underneath
-            and can re-ask more specifically.
+            + aggregation. Side-by-side comparisons (e.g.{" "}
+            <em>&quot;Costco vs Whole Foods this year&quot;</em>) used
+            to be where it struggled — the new multi-step beta below
+            now handles those by running each part as its own query.
+            For open-ended analysis (&quot;…and tell me why&quot;) the
+            answer can still be partial — but you always get the
+            source rows underneath and can re-ask more specifically.
+          </p>
+
+          <h2 className="mt-12 text-2xl font-semibold tracking-tight text-[#0F172A]">
+            Smarter answers — the AI Search beta
+          </h2>
+          <p>
+            CentProof 0.2.1 adds three opt-in upgrades to Ask
+            CentProof, all running on your Mac with the same local
+            model. Turn them on in Preferences (
+            <code className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[0.92em]">⌘ ,</code>
+            ) → AI → &quot;AI Search (beta)&quot;:
+          </p>
+          <ul className="list-disc space-y-3 pl-6">
+            <li>
+              <strong className="font-semibold text-[#0F172A]">
+                Smart merchant &amp; category matching.
+              </strong>{" "}
+              Phrasing like <em>&quot;warehouse club&quot;</em> or{" "}
+              <em>&quot;the streaming service&quot;</em> is matched to a
+              real name in your data (&quot;Costco&quot;,
+              &quot;Netflix&quot;) using on-device similarity — so you
+              don&apos;t have to remember exactly how a merchant is
+              spelled. CentProof shows you what it matched, and the
+              figures stay exact; only the matching gets fuzzier.
+            </li>
+            <li>
+              <strong className="font-semibold text-[#0F172A]">
+                Conversational follow-ups.
+              </strong>{" "}
+              Ask a question, then refine it:{" "}
+              <em>&quot;top 5 merchants this year&quot;</em> →{" "}
+              <em>&quot;just the Apple Card&quot;</em>. The follow-up
+              builds on your previous question instead of starting from
+              scratch.
+            </li>
+            <li>
+              <strong className="font-semibold text-[#0F172A]">
+                Multi-step questions.
+              </strong>{" "}
+              Comparisons like{" "}
+              <em>&quot;Costco vs Whole Foods this year&quot;</em> or{" "}
+              <em>
+                &quot;did I spend more on groceries this month or last
+                month?&quot;
+              </em>{" "}
+              are broken into separate queries, each run on your data,
+              and the results are combined — with every number still
+              computed locally.
+            </li>
+          </ul>
+          <p>
+            These are off by default while in beta. With the flags off,
+            Ask CentProof behaves exactly as it did before — the model
+            still plans and explains, but every number always comes
+            from your data, never invented.
           </p>
 
           <h2 className="mt-12 text-2xl font-semibold tracking-tight text-[#0F172A]">
@@ -203,6 +260,16 @@ export default function DocAsk() {
               the transaction line highlighted — full audit trail.
             </li>
           </ul>
+          <p>
+            A{" "}
+            <strong className="font-semibold text-[#0F172A]">
+              View transactions
+            </strong>{" "}
+            button opens the exact rows behind any answer in a pop-up —
+            including grouped answers like &quot;top 5 merchants&quot;
+            and each step of a multi-step comparison — every row linked
+            to its source PDF page, without leaving Ask CentProof.
+          </p>
           <p>
             CentProof is built around the principle that any number
             you see should be traceable to its source. Ask CentProof
