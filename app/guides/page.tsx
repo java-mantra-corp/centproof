@@ -23,6 +23,13 @@ export const metadata: Metadata = {
  */
 const guides = [
   {
+    slug: "getting-better-answers-from-ask-centproof",
+    title: "Getting better answers from Ask CentProof",
+    description:
+      "Three new opt-in upgrades to the local AI search — smart merchant matching, conversational follow-ups, and one-question comparisons — plus the pop-up that shows the exact transactions behind any answer, each linked to its source PDF page.",
+    readTime: "6 min read",
+  },
+  {
     slug: "tracking-freelancer-expenses-on-a-mac",
     title:
       "Tracking 1099 business expenses on your Mac, without the cloud",
@@ -71,7 +78,7 @@ export default function GuidesIndexPage() {
           </h1>
           <p className="mt-6 text-lg leading-8 text-[#475569]">
             Useful regardless of whether you use CentProof. We write these to
-            be the page we wish we'd read first when researching this
+            be the page we wish we&apos;d read first when researching this
             problem — not as marketing dressed up as content.
           </p>
         </div>
